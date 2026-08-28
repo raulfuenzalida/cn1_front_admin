@@ -123,25 +123,6 @@ Cuando exista el backend, también necesitarás:
 - **VITE_API_BASE_URL** - URL del API Gateway de AWS
 - **VITE_API_SCOPE** - Scope configurado en API Gateway para validar tokens
 
-## Light Mode y Dark Mode
-
-PrintWorks Admin soporta temas claro y oscuro con las siguientes características:
-
-- **Persistencia**: La preferencia se guarda en `localStorage` con clave `printworks-theme`
-- **Fallback**: Si no hay preferencia guardada, usa `prefers-color-scheme` del sistema
-- **Cambio manual**: Botón en la topbar para alternar entre temas
-- **Aplicación inmediata**: El cambio no requiere recarga de página
-
-### Paleta oficial PrintWorks
-
-- `#606c38` - Primary
-- `#283618` - Primary Dark
-- `#fefae0` - Surface Soft
-- `#dda15e` - Accent
-- `#bc6c25` - Accent Strong
-
-Los componentes usan variables CSS semánticas para adaptarse automáticamente al tema seleccionado.
-
 ## Testing
 
 ### Configuración
