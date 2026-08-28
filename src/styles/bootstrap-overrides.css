@@ -1,0 +1,224 @@
+/* Override Bootstrap para integrar identidad visual PrintWorks */
+
+.bg-primary {
+  background-color: var(--pw-primary) !important;
+}
+
+.text-primary {
+  color: var(--pw-primary) !important;
+}
+
+.text-muted {
+  color: var(--pw-text-muted) !important;
+}
+
+.btn-primary {
+  background-color: var(--pw-primary);
+  border-color: var(--pw-primary);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: var(--pw-primary-hover);
+  border-color: var(--pw-primary-hover);
+  color: #ffffff;
+}
+
+.btn-outline-primary {
+  color: var(--pw-primary);
+  border-color: var(--pw-primary);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--pw-primary);
+  border-color: var(--pw-primary);
+  color: #ffffff;
+}
+
+/* Cards */
+.card {
+  background-color: var(--pw-surface);
+  border-color: var(--pw-border);
+  color: var(--pw-text-primary);
+}
+
+.card-header {
+  background-color: var(--pw-surface-elevated);
+  border-color: var(--pw-border);
+  color: var(--pw-text-primary);
+}
+
+.card-text {
+  color: var(--pw-text-secondary);
+}
+
+/* Navbar */
+.navbar {
+  background-color: var(--pw-navbar-bg);
+  border-color: var(--pw-border);
+  color: var(--pw-navbar-text);
+}
+
+.navbar .navbar-brand {
+  color: var(--pw-navbar-text);
+  text-decoration: none;
+  border: none;
+  background: transparent;
+}
+
+.navbar-dark {
+  background-color: var(--pw-primary-dark);
+}
+
+/* Sidebar personalizado */
+.sidebar {
+  background-color: var(--pw-sidebar-bg);
+  border-right: 1px solid var(--pw-border);
+}
+
+.sidebar .nav-link {
+  color: var(--pw-sidebar-text);
+}
+
+.sidebar .nav-link:hover {
+  background-color: var(--pw-sidebar-hover);
+  color: var(--pw-sidebar-hover-text);
+}
+
+.sidebar .nav-link.active {
+  background-color: var(--pw-sidebar-active);
+  color: #4A4A48;
+  border-right: none;
+}
+
+/* Tablas */
+.table {
+  color: var(--pw-text-primary);
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  color: var(--pw-text-primary);
+  background-color: var(--pw-surface-elevated);
+}
+
+/* Formularios */
+.form-control {
+  background-color: var(--pw-surface);
+  border-color: var(--pw-border);
+  color: var(--pw-text-primary);
+}
+
+.form-control:focus {
+  background-color: var(--pw-surface);
+  border-color: var(--pw-focus);
+  color: var(--pw-text-primary);
+}
+
+.form-control::placeholder {
+  color: var(--pw-text-muted);
+}
+
+.form-select {
+  background-color: var(--pw-surface);
+  border-color: var(--pw-border);
+  color: var(--pw-text-primary);
+}
+
+/* Offcanvas */
+.offcanvas {
+  background-color: var(--pw-sidebar-bg);
+  color: var(--pw-sidebar-text);
+}
+
+.offcanvas-header {
+  border-color: var(--pw-border);
+}
+
+.offcanvas-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Dropdown */
+.dropdown-toggle {
+  background-color: #566246 !important;
+  color: #F1F2EB !important;
+  border: none;
+}
+
+.dropdown-toggle:hover,
+.dropdown-toggle:focus,
+.dropdown-toggle:active,
+.dropdown-toggle.show {
+  background-color: #4A4A48 !important;
+  color: #FFFFFF !important;
+}
+
+.dropdown-menu {
+  background-color: var(--pw-sidebar-bg);
+  border-color: var(--pw-border);
+}
+
+.dropdown-item {
+  color: var(--pw-sidebar-text);
+}
+
+.dropdown-item:hover {
+  background-color: var(--pw-sidebar-hover);
+  color: var(--pw-sidebar-hover-text);
+}
+
+/* Modal */
+.modal-content {
+  background-color: var(--pw-surface);
+  color: var(--pw-text-primary);
+  border-color: var(--pw-border);
+}
+
+.modal-header {
+  border-color: var(--pw-border);
+}
+
+.modal-footer {
+  border-color: var(--pw-border);
+}
+
+/* Alert */
+.alert {
+  color: var(--pw-text-primary);
+}
+
+.alert-primary {
+  background-color: var(--pw-surface-secondary);
+  border-color: var(--pw-primary);
+  color: var(--pw-text-primary);
+}
+
+.alert-secondary {
+  background-color: var(--pw-surface-elevated);
+  border-color: var(--pw-border);
+  color: var(--pw-text-primary);
+}
+
+.alert-success {
+  background-color: var(--pw-surface-secondary);
+  border-color: var(--pw-success);
+  color: var(--pw-text-primary);
+}
+
+.alert-warning {
+  background-color: var(--pw-surface-secondary);
+  border-color: var(--pw-warning);
+  color: var(--pw-text-primary);
+}
+
+.alert-danger {
+  background-color: var(--pw-surface-secondary);
+  border-color: var(--pw-danger);
+  color: var(--pw-text-primary);
+}
+
+.alert-info {
+  background-color: var(--pw-surface-secondary);
+  border-color: var(--pw-info);
+  color: var(--pw-text-primary);
+}

@@ -1,0 +1,35 @@
+:root {
+  /* Paleta oficial PrintWorks - Timberwolf */
+  --pw-primary: #566246;
+  --pw-primary-dark: #4A4A48;
+  --pw-surface-soft: #A4C2A5;
+  --pw-accent: #A4C2A5;
+  --pw-accent-strong: #4A4A48;
+
+  /* Tokens semánticos - Tema único corporativo */
+  --pw-background: #F1F2EB;
+  --pw-surface: #FFFFFF;
+  --pw-surface-secondary: #D8DAD3;
+  --pw-surface-elevated: #F1F2EB;
+  --pw-text-primary: #4A4A48;
+  --pw-text-secondary: #566246;
+  --pw-text-muted: #A4C2A5;
+  --pw-border: #D8DAD3;
+  --pw-border-light: #D8DAD3;
+  --pw-focus: #566246;
+  --pw-primary-hover: #4A4A48;
+  --pw-success: #566246;
+  --pw-warning: #A4C2A5;
+  --pw-danger: #4A4A48;
+  --pw-info: #566246;
+  --pw-login-text: #566246;
+
+  /* Tokens específicos de layout */
+  --pw-navbar-bg: #4A4A48;
+  --pw-navbar-text: #F1F2EB;
+  --pw-sidebar-bg: #566246;
+  --pw-sidebar-text: #F1F2EB;
+  --pw-sidebar-active: #A4C2A5;
+  --pw-sidebar-hover: #4A4A48;
+  --pw-sidebar-hover-text: #FFFFFF;
+}

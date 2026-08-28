@@ -1,0 +1,174 @@
+/* Componentes personalizados de PrintWorks Admin */
+
+/* Textos de Login */
+.login-text {
+  color: var(--pw-login-text) !important;
+}
+
+/* Logo de marca */
+.brand-logo {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #A4C2A5;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Page header */
+.page-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--pw-border);
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--pw-text-primary);
+}
+
+.page-subtitle {
+  font-size: 1rem;
+  color: var(--pw-text-secondary);
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+}
+
+/* Stats cards */
+.stat-card {
+  border: 1px solid var(--pw-border);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  background-color: var(--pw-surface);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--pw-primary);
+  margin: 0;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--pw-text-secondary);
+  margin: 0;
+  margin-top: 0.25rem;
+}
+
+/* Badges de estado */
+.badge-status {
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-active {
+  background-color: var(--pw-success);
+  color: #ffffff;
+}
+
+.badge-inactive {
+  background-color: var(--pw-text-muted);
+  color: #4A4A48;
+}
+
+.badge-current {
+  background-color: var(--pw-success);
+  color: #ffffff;
+}
+
+.badge-outdated {
+  background-color: var(--pw-warning);
+  color: #4A4A48;
+}
+
+.badge-created {
+  background-color: var(--pw-info);
+  color: #ffffff;
+}
+
+.badge-confirmed {
+  background-color: var(--pw-primary);
+  color: #ffffff;
+}
+
+.badge-completed {
+  background-color: var(--pw-success);
+  color: #ffffff;
+}
+
+.badge-cancelled {
+  background-color: var(--pw-danger);
+  color: #ffffff;
+}
+
+/* Loading states */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.loading-text {
+  color: var(--pw-text-secondary);
+  margin-top: 1rem;
+}
+
+/* Empty states */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--pw-text-secondary);
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+  color: var(--pw-text-secondary);
+}
+
+.empty-state-subtext {
+  font-size: 0.875rem;
+  color: var(--pw-text-secondary);
+}
+
+/* User menu */
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-name {
+  font-weight: 500;
+  color: var(--pw-navbar-text);
+}
+
+/* Responsive helpers */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+}
