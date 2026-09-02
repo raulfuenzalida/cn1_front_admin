@@ -15,7 +15,7 @@ const Dashboard = () => {
       </div>
 
       <Row className="g-4 mb-4">
-        <Col md={6} lg={3}>
+        <Col xs={12} md={6} lg={3}>
           <Card className="stat-card h-100">
             <Card.Body>
               <h3 className="stat-value">12</h3>
@@ -23,7 +23,7 @@ const Dashboard = () => {
             </Card.Body>
           </Card>
         </Col>
-        <Col md={6} lg={3}>
+        <Col xs={12} md={6} lg={3}>
           <Card className="stat-card h-100">
             <Card.Body>
               <h3 className="stat-value">3</h3>
@@ -31,7 +31,7 @@ const Dashboard = () => {
             </Card.Body>
           </Card>
         </Col>
-        <Col md={6} lg={3}>
+        <Col xs={12} md={6} lg={3}>
           <Card className="stat-card h-100">
             <Card.Body>
               <h3 className="stat-value">2</h3>
@@ -39,7 +39,7 @@ const Dashboard = () => {
             </Card.Body>
           </Card>
         </Col>
-        <Col md={6} lg={3}>
+        <Col xs={12} md={6} lg={3}>
           <Card className="stat-card h-100">
             <Card.Body>
               <h3 className="stat-value">5</h3>
