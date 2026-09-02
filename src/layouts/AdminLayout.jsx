@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Offcanvas, Navbar, Nav, Button, Dropdown } from 'react-bootstrap';
 import { authService } from '../services/authService';
+import ThemeSwitch from '../components/common/ThemeSwitch';
 
 /**
  * Layout administrativo principal
@@ -54,13 +55,19 @@ const AdminLayout = () => {
           </Navbar.Brand>
 
           <div className="ms-auto d-flex align-items-center gap-3">
+            {/* Theme Switch */}
+            <ThemeSwitch />
             {/* Menú usuario */}
             <Dropdown>
               <Dropdown.Toggle variant="light" id="user-dropdown" className="user-menu">
-                <span className="user-name">{authService.getDisplayName()}</span>
+                <span className="user-avatar">👤</span>
+                <span className="user-name d-none d-sm-inline">{authService.getDisplayName()}</span>
               </Dropdown.Toggle>
 
               <Dropdown.Menu align="end">
+                <Dropdown.Header className="d-sm-none">
+                  {authService.getDisplayName()}
+                </Dropdown.Header>
                 <Dropdown.Item onClick={handleLogout}>Cerrar sesión</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
@@ -110,7 +117,7 @@ const AdminLayout = () => {
         </Offcanvas>
 
         {/* Contenido principal */}
-        <div className="flex-grow-1 p-4" style={{ maxWidth: 'calc(100% - 250px)' }}>
+        <div className="flex-grow-1 p-4 main-content">
           <Outlet />
         </div>
       </div>

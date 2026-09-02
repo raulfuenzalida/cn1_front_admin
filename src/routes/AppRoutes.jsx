@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { MsalProvider } from '@azure/msal-react';
 import { msalInstance } from '../config/msalConfig';
+import { ThemeProvider } from '../context/ThemeContext';
 import ProtectedRoute from './ProtectedRoute';
 import AdminLayout from '../layouts/AdminLayout';
 import Login from '../pages/Login/Login';
@@ -30,34 +31,36 @@ const NotFound = lazy(() => import('../pages/NotFound/NotFound'));
 const AppRoutes = () => {
   return (
     <MsalProvider instance={msalInstance}>
-      <Router>
-        <Suspense fallback={<Loading />}>
-          <Routes>
-            {/* Ruta pública - Login */}
-            <Route path="/login" element={<Login />} />
+      <ThemeProvider>
+        <Router>
+          <Suspense fallback={<Loading />}>
+            <Routes>
+              {/* Ruta pública - Login */}
+              <Route path="/login" element={<Login />} />
 
-            {/* Rutas protegidas con layout administrativo */}
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <AdminLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Navigate to="/dashboard" replace />} />
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="products" element={<div className="p-4">Productos (próximamente)</div>} />
-              <Route path="orders" element={<div className="p-4">Pedidos (próximamente)</div>} />
-              <Route path="configuration" element={<div className="p-4">Configuración (próximamente)</div>} />
-            </Route>
+              {/* Rutas protegidas con layout administrativo */}
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <AdminLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Navigate to="/dashboard" replace />} />
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="products" element={<div className="p-4">Productos (próximamente)</div>} />
+                <Route path="orders" element={<div className="p-4">Pedidos (próximamente)</div>} />
+                <Route path="configuration" element={<div className="p-4">Configuración (próximamente)</div>} />
+              </Route>
 
-            {/* Rutas de error */}
-            <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </Router>
+              {/* Rutas de error */}
+              <Route path="/unauthorized" element={<Unauthorized />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </Router>
+      </ThemeProvider>
     </MsalProvider>
   );
 };

@@ -1,35 +1,156 @@
 :root {
-  /* Paleta oficial PrintWorks - Timberwolf */
-  --pw-primary: #566246;
-  --pw-primary-dark: #4A4A48;
-  --pw-surface-soft: #A4C2A5;
-  --pw-accent: #A4C2A5;
-  --pw-accent-strong: #4A4A48;
+  /* Escala cromática 50-950 - Neutros */
+  --neutral-50: #FAFAF9;
+  --neutral-100: #F5F5F4;
+  --neutral-200: #E7E5E4;
+  --neutral-300: #D6D3D1;
+  --neutral-400: #A8A29E;
+  --neutral-500: #78716C;
+  --neutral-600: #57534E;
+  --neutral-700: #44403C;
+  --neutral-800: #292524;
+  --neutral-900: #1C1917;
+  --neutral-950: #0C0A09;
 
-  /* Tokens semánticos - Tema único corporativo */
-  --pw-background: #F1F2EB;
-  --pw-surface: #FFFFFF;
-  --pw-surface-secondary: #D8DAD3;
-  --pw-surface-elevated: #F1F2EB;
-  --pw-text-primary: #4A4A48;
-  --pw-text-secondary: #566246;
-  --pw-text-muted: #A4C2A5;
-  --pw-border: #D8DAD3;
-  --pw-border-light: #D8DAD3;
-  --pw-focus: #566246;
-  --pw-primary-hover: #4A4A48;
-  --pw-success: #566246;
-  --pw-warning: #A4C2A5;
-  --pw-danger: #4A4A48;
-  --pw-info: #566246;
-  --pw-login-text: #566246;
+  /* Escala cromática 50-950 - Brand (Verde/Teal) */
+  --brand-50: #ECFDF8;
+  --brand-100: #D1FAED;
+  --brand-200: #A7F3DC;
+  --brand-300: #6EE7C7;
+  --brand-400: #34D3AD;
+  --brand-500: #14B89A;
+  --brand-600: #0D947D;
+  --brand-700: #0F7667;
+  --brand-800: #115E54;
+  --brand-900: #134E47;
+  --brand-950: #062F2B;
 
-  /* Tokens específicos de layout */
-  --pw-navbar-bg: #4A4A48;
-  --pw-navbar-text: #F1F2EB;
-  --pw-sidebar-bg: #566246;
-  --pw-sidebar-text: #F1F2EB;
-  --pw-sidebar-active: #A4C2A5;
-  --pw-sidebar-hover: #4A4A48;
-  --pw-sidebar-hover-text: #FFFFFF;
+  /* Escala cromática 50-950 - Status */
+  --status-success-50: #F0FDF4;
+  --status-success-500: #22C55E;
+  --status-success-600: #16A34A;
+  --status-success-700: #15803D;
+
+  --status-warning-50: #FEFCE8;
+  --status-warning-500: #EAB308;
+  --status-warning-600: #CA8A04;
+  --status-warning-700: #A16207;
+
+  --status-error-50: #FEF2F2;
+  --status-error-500: #EF4444;
+  --status-error-600: #DC2626;
+  --status-error-700: #B91C1C;
+
+  --status-info-50: #EFF6FF;
+  --status-info-500: #3B82F6;
+  --status-info-600: #2563EB;
+  --status-info-700: #1D4ED8;
+
+  /* Tokens semánticos base - Light Mode */
+  --bg-canvas: var(--neutral-50);
+  --bg-surface: var(--neutral-50);
+  --bg-surface-elevated: var(--neutral-100);
+  --bg-surface-interactive: var(--neutral-200);
+  --bg-surface-overlay: var(--neutral-100);
+
+  --text-primary: var(--neutral-900);
+  --text-secondary: var(--neutral-600);
+  --text-tertiary: var(--neutral-500);
+  --text-inverse: var(--neutral-50);
+
+  --border-default: var(--neutral-200);
+  --border-strong: var(--neutral-300);
+  --border-subtle: var(--neutral-100);
+
+  --brand-primary: var(--brand-500);
+  --brand-primary-hover: var(--brand-600);
+  --brand-primary-active: var(--brand-700);
+  --brand-primary-subtle: var(--brand-100);
+
+  --status-success: var(--status-success-600);
+  --status-success-bg: var(--status-success-50);
+
+  --status-warning: var(--status-warning-600);
+  --status-warning-bg: var(--status-warning-50);
+
+  --status-error: var(--status-error-600);
+  --status-error-bg: var(--status-error-50);
+
+  --status-info: var(--status-info-600);
+  --status-info-bg: var(--status-info-50);
+
+  /* Layout específico - Light Mode */
+  --layout-navbar-bg: var(--brand-800);
+  --layout-navbar-text: var(--neutral-50);
+  --layout-navbar-border: var(--brand-900);
+
+  --layout-sidebar-bg: var(--brand-600);
+  --layout-sidebar-text: var(--neutral-50);
+  --layout-sidebar-border: var(--brand-700);
+
+  --layout-sidebar-item-hover-bg: var(--brand-500);
+  --layout-sidebar-item-hover-text: var(--neutral-50);
+
+  --layout-sidebar-item-active-bg: var(--brand-400);
+  --layout-sidebar-item-active-text: var(--neutral-900);
+
+  --layout-user-dropdown-bg: var(--brand-800);
+  --layout-user-dropdown-text: var(--neutral-50);
+  --layout-user-dropdown-hover-bg: var(--brand-900);
+  --layout-user-dropdown-hover-text: var(--neutral-50);
+}
+
+[data-theme='dark'] {
+  /* Tokens semánticos base - Dark Mode */
+  --bg-canvas: var(--neutral-950);
+  --bg-surface: var(--neutral-900);
+  --bg-surface-elevated: var(--neutral-800);
+  --bg-surface-interactive: var(--neutral-700);
+  --bg-surface-overlay: var(--neutral-900);
+
+  --text-primary: var(--neutral-50);
+  --text-secondary: var(--neutral-400);
+  --text-tertiary: var(--neutral-500);
+  --text-inverse: var(--neutral-900);
+
+  --border-default: var(--neutral-700);
+  --border-strong: var(--neutral-600);
+  --border-subtle: var(--neutral-800);
+
+  --brand-primary: var(--brand-400);
+  --brand-primary-hover: var(--brand-300);
+  --brand-primary-active: var(--brand-200);
+  --brand-primary-subtle: var(--brand-900);
+
+  --status-success: var(--status-success-500);
+  --status-success-bg: var(--status-success-500);
+
+  --status-warning: var(--status-warning-500);
+  --status-warning-bg: var(--status-warning-500);
+
+  --status-error: var(--status-error-500);
+  --status-error-bg: var(--status-error-500);
+
+  --status-info: var(--status-info-500);
+  --status-info-bg: var(--status-info-500);
+
+  /* Layout específico - Dark Mode */
+  --layout-navbar-bg: var(--neutral-900);
+  --layout-navbar-text: var(--neutral-50);
+  --layout-navbar-border: var(--neutral-800);
+
+  --layout-sidebar-bg: var(--neutral-800);
+  --layout-sidebar-text: var(--neutral-50);
+  --layout-sidebar-border: var(--neutral-700);
+
+  --layout-sidebar-item-hover-bg: var(--neutral-700);
+  --layout-sidebar-item-hover-text: var(--neutral-50);
+
+  --layout-sidebar-item-active-bg: var(--brand-600);
+  --layout-sidebar-item-active-text: var(--neutral-50);
+
+  --layout-user-dropdown-bg: var(--neutral-800);
+  --layout-user-dropdown-text: var(--neutral-50);
+  --layout-user-dropdown-hover-bg: var(--neutral-700);
+  --layout-user-dropdown-hover-text: var(--neutral-50);
 }

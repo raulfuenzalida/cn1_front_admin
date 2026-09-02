@@ -1,137 +1,137 @@
 /* Override Bootstrap para integrar identidad visual PrintWorks */
 
 .bg-primary {
-  background-color: var(--pw-primary) !important;
+  background-color: var(--brand-primary) !important;
 }
 
 .text-primary {
-  color: var(--pw-primary) !important;
+  color: var(--brand-primary) !important;
 }
 
 .text-muted {
-  color: var(--pw-text-muted) !important;
+  color: var(--text-tertiary) !important;
 }
 
 .btn-primary {
-  background-color: var(--pw-primary);
-  border-color: var(--pw-primary);
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
   color: #ffffff;
 }
 
 .btn-primary:hover {
-  background-color: var(--pw-primary-hover);
-  border-color: var(--pw-primary-hover);
+  background-color: var(--brand-primary-hover);
+  border-color: var(--brand-primary-hover);
   color: #ffffff;
 }
 
 .btn-outline-primary {
-  color: var(--pw-primary);
-  border-color: var(--pw-primary);
+  color: var(--brand-primary);
+  border-color: var(--brand-primary);
 }
 
 .btn-outline-primary:hover {
-  background-color: var(--pw-primary);
-  border-color: var(--pw-primary);
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
   color: #ffffff;
 }
 
 /* Cards */
 .card {
-  background-color: var(--pw-surface);
-  border-color: var(--pw-border);
-  color: var(--pw-text-primary);
+  background-color: var(--bg-surface);
+  border-color: var(--border-default);
+  color: var(--text-primary);
 }
 
 .card-header {
-  background-color: var(--pw-surface-elevated);
-  border-color: var(--pw-border);
-  color: var(--pw-text-primary);
+  background-color: var(--bg-surface-elevated);
+  border-color: var(--border-default);
+  color: var(--text-primary);
 }
 
 .card-text {
-  color: var(--pw-text-secondary);
+  color: var(--text-secondary);
 }
 
 /* Navbar */
 .navbar {
-  background-color: var(--pw-navbar-bg);
-  border-color: var(--pw-border);
-  color: var(--pw-navbar-text);
+  background-color: var(--layout-navbar-bg);
+  border-color: var(--layout-navbar-border);
+  color: var(--layout-navbar-text);
 }
 
 .navbar .navbar-brand {
-  color: var(--pw-navbar-text);
+  color: var(--layout-navbar-text);
   text-decoration: none;
   border: none;
   background: transparent;
 }
 
 .navbar-dark {
-  background-color: var(--pw-primary-dark);
+  background-color: var(--brand-800);
 }
 
 /* Sidebar personalizado */
 .sidebar {
-  background-color: var(--pw-sidebar-bg);
-  border-right: 1px solid var(--pw-border);
+  background-color: var(--layout-sidebar-bg);
+  border-right: 1px solid var(--layout-sidebar-border);
 }
 
 .sidebar .nav-link {
-  color: var(--pw-sidebar-text);
+  color: var(--layout-sidebar-text);
 }
 
 .sidebar .nav-link:hover {
-  background-color: var(--pw-sidebar-hover);
-  color: var(--pw-sidebar-hover-text);
+  background-color: var(--layout-sidebar-item-hover-bg);
+  color: var(--layout-sidebar-item-hover-text);
 }
 
 .sidebar .nav-link.active {
-  background-color: var(--pw-sidebar-active);
-  color: #4A4A48;
+  background-color: var(--layout-sidebar-item-active-bg);
+  color: var(--layout-sidebar-item-active-text);
   border-right: none;
 }
 
 /* Tablas */
 .table {
-  color: var(--pw-text-primary);
+  color: var(--text-primary);
 }
 
 .table-striped > tbody > tr:nth-of-type(odd) > * {
-  color: var(--pw-text-primary);
-  background-color: var(--pw-surface-elevated);
+  color: var(--text-primary);
+  background-color: var(--bg-surface-elevated);
 }
 
 /* Formularios */
 .form-control {
-  background-color: var(--pw-surface);
-  border-color: var(--pw-border);
-  color: var(--pw-text-primary);
+  background-color: var(--bg-surface);
+  border-color: var(--border-default);
+  color: var(--text-primary);
 }
 
 .form-control:focus {
-  background-color: var(--pw-surface);
-  border-color: var(--pw-focus);
-  color: var(--pw-text-primary);
+  background-color: var(--bg-surface);
+  border-color: var(--brand-primary);
+  color: var(--text-primary);
 }
 
 .form-control::placeholder {
-  color: var(--pw-text-muted);
+  color: var(--text-tertiary);
 }
 
 .form-select {
-  background-color: var(--pw-surface);
-  border-color: var(--pw-border);
-  color: var(--pw-text-primary);
+  background-color: var(--bg-surface);
+  border-color: var(--border-default);
+  color: var(--text-primary);
 }
 
 /* Offcanvas */
 .offcanvas {
-  background-color: var(--pw-sidebar-bg);
-  color: var(--pw-sidebar-text);
+  background-color: var(--layout-sidebar-bg);
+  color: var(--layout-sidebar-text);
 }
 
 .offcanvas-header {
-  border-color: var(--pw-border);
+  border-color: var(--border-default);
 }
 
 .offcanvas-backdrop {
@@ -140,8 +140,8 @@
 
 /* Dropdown */
 .dropdown-toggle {
-  background-color: #566246 !important;
-  color: #F1F2EB !important;
+  background-color: var(--layout-user-dropdown-bg) !important;
+  color: var(--layout-user-dropdown-text) !important;
   border: none;
 }
 
@@ -149,76 +149,76 @@
 .dropdown-toggle:focus,
 .dropdown-toggle:active,
 .dropdown-toggle.show {
-  background-color: #4A4A48 !important;
-  color: #FFFFFF !important;
+  background-color: var(--layout-user-dropdown-hover-bg) !important;
+  color: var(--layout-user-dropdown-hover-text) !important;
 }
 
 .dropdown-menu {
-  background-color: var(--pw-sidebar-bg);
-  border-color: var(--pw-border);
+  background-color: var(--layout-sidebar-bg);
+  border-color: var(--border-default);
 }
 
 .dropdown-item {
-  color: var(--pw-sidebar-text);
+  color: var(--layout-sidebar-text);
 }
 
 .dropdown-item:hover {
-  background-color: var(--pw-sidebar-hover);
-  color: var(--pw-sidebar-hover-text);
+  background-color: var(--layout-sidebar-item-hover-bg);
+  color: var(--layout-sidebar-item-hover-text);
 }
 
 /* Modal */
 .modal-content {
-  background-color: var(--pw-surface);
-  color: var(--pw-text-primary);
-  border-color: var(--pw-border);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border-color: var(--border-default);
 }
 
 .modal-header {
-  border-color: var(--pw-border);
+  border-color: var(--border-default);
 }
 
 .modal-footer {
-  border-color: var(--pw-border);
+  border-color: var(--border-default);
 }
 
 /* Alert */
 .alert {
-  color: var(--pw-text-primary);
+  color: var(--text-primary);
 }
 
 .alert-primary {
-  background-color: var(--pw-surface-secondary);
-  border-color: var(--pw-primary);
-  color: var(--pw-text-primary);
+  background-color: var(--brand-primary-subtle);
+  border-color: var(--brand-primary);
+  color: var(--text-primary);
 }
 
 .alert-secondary {
-  background-color: var(--pw-surface-elevated);
-  border-color: var(--pw-border);
-  color: var(--pw-text-primary);
+  background-color: var(--bg-surface-elevated);
+  border-color: var(--border-default);
+  color: var(--text-primary);
 }
 
 .alert-success {
-  background-color: var(--pw-surface-secondary);
-  border-color: var(--pw-success);
-  color: var(--pw-text-primary);
+  background-color: var(--status-success-bg);
+  border-color: var(--status-success);
+  color: var(--text-primary);
 }
 
 .alert-warning {
-  background-color: var(--pw-surface-secondary);
-  border-color: var(--pw-warning);
-  color: var(--pw-text-primary);
+  background-color: var(--status-warning-bg);
+  border-color: var(--status-warning);
+  color: var(--text-primary);
 }
 
 .alert-danger {
-  background-color: var(--pw-surface-secondary);
-  border-color: var(--pw-danger);
-  color: var(--pw-text-primary);
+  background-color: var(--status-error-bg);
+  border-color: var(--status-error);
+  color: var(--text-primary);
 }
 
 .alert-info {
-  background-color: var(--pw-surface-secondary);
-  border-color: var(--pw-info);
-  color: var(--pw-text-primary);
+  background-color: var(--status-info-bg);
+  border-color: var(--status-info);
+  color: var(--text-primary);
 }
