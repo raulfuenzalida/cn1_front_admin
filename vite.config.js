@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/cn1_front_admin/',
   plugins: [react()],
   build: {
     rollupOptions: {
