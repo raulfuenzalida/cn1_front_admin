@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Offcanvas, Navbar, Nav, Button, Dropdown } from 'react-bootstrap';
 import { authService } from '../services/authService';
 import ThemeSwitch from '../components/common/ThemeSwitch';
@@ -15,12 +15,11 @@ import ThemeSwitch from '../components/common/ThemeSwitch';
 const AdminLayout = () => {
   const [showSidebar, setShowSidebar] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       await authService.logout();
-      navigate('/login');
+      // logoutRedirect() redirige automáticamente a VITE_ENTRA_POST_LOGOUT_REDIRECT_URI
     } catch (error) {
       console.error('Error durante logout:', error);
     }

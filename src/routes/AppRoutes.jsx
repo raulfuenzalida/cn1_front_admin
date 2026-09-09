@@ -16,16 +16,16 @@ const NotFound = lazy(() => import('../pages/NotFound/NotFound'));
 
 /**
  * Configuración de rutas de la aplicación
- * 
+ *
  * Rutas públicas:
  * - /login
- * 
+ *
  * Rutas protegidas (requieren autenticación MSAL):
- * - /dashboard
- * - /products
- * - /orders
- * - /configuration
- * 
+ * - /dashboard (implementado)
+ * - /products (temporal - próximamente)
+ * - /orders (temporal - próximamente)
+ * - /configuration (implementado)
+ *
  * Las páginas administrativas se cargan bajo demanda con React.lazy()
  * para optimizar el bundle inicial.
  */
@@ -33,7 +33,7 @@ const AppRoutes = () => {
   return (
     <MsalProvider instance={msalInstance}>
       <ThemeProvider>
-        <Router>
+        <Router basename="/cn1_front_admin">
           <Suspense fallback={<Loading />}>
             <Routes>
               {/* Ruta pública - Login */}
