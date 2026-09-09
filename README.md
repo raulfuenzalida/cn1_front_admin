@@ -150,8 +150,8 @@ La configuración esperada es:
 # Microsoft Entra ID / MSAL Configuration
 VITE_ENTRA_CLIENT_ID=REEMPLAZAR
 VITE_ENTRA_TENANT_ID=REEMPLAZAR
-VITE_ENTRA_REDIRECT_URI=http://localhost:5173/cn1_front_admin/dashboard
-VITE_ENTRA_POST_LOGOUT_REDIRECT_URI=http://localhost:5173/cn1_front_admin/login
+VITE_ENTRA_REDIRECT_URI=http://localhost:5173/cn1_front_admin/#/dashboard
+VITE_ENTRA_POST_LOGOUT_REDIRECT_URI=http://localhost:5173/cn1_front_admin/#/login
 
 # API Configuration
 VITE_API_BASE_URL=http://localhost:8080
@@ -228,9 +228,11 @@ La autenticación administrativa utiliza Microsoft Entra ID mediante MSAL.
    - Directory (tenant) ID
 6. En **Authentication**, configurar la aplicación como **Single-page application (SPA)**.
 7. Registrar las URI de redirección correspondientes:
-   - Redirect URI: `http://localhost:5173/cn1_front_admin/dashboard` (desarrollo)
-   - Post logout redirect URI: `http://localhost:5173/cn1_front_admin/login` (desarrollo)
-   - Para producción, usar las URLs correspondientes del entorno de despliegue
+   - Redirect URI: `http://localhost:5173/cn1_front_admin/#/dashboard` (desarrollo)
+   - Post logout redirect URI: `http://localhost:5173/cn1_front_admin/#/login` (desarrollo)
+   - Para producción, usar las URLs correspondientes del entorno de despliegue con el formato `https://dominio.github.io/repo/#/ruta`
+
+> **Nota para GitHub Pages:** Esta aplicación usa HashRouter para funcionar correctamente en servidores estáticos como GitHub Pages. Las URLs incluyen `#/` antes de las rutas (ej: `#/dashboard`).
 8. Configurar los permisos y scopes requeridos por la aplicación.
 
 > **Nota importante:** Al actualizar las URLs de redirección en Entra ID, también deben actualizarse los secrets en GitHub Actions (VITE_ENTRA_REDIRECT_URI y VITE_ENTRA_POST_LOGOUT_REDIRECT_URI) para el despliegue en producción.

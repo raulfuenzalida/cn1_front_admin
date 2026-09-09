@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { MsalProvider, useMsal } from '@azure/msal-react';
 import { msalInstance } from '../config/msalConfig';
 import { ThemeProvider } from '../context/ThemeContext';
