@@ -38,6 +38,14 @@ jobs:
 
       - name: Build with Vite
         run: npm run build
+        env:
+          VITE_ENTRA_CLIENT_ID: ${{ secrets.VITE_ENTRA_CLIENT_ID }}
+          VITE_ENTRA_TENANT_ID: ${{ secrets.VITE_ENTRA_TENANT_ID }}
+          VITE_ENTRA_REDIRECT_URI: ${{ secrets.VITE_ENTRA_REDIRECT_URI }}
+          VITE_ENTRA_POST_LOGOUT_REDIRECT_URI: ${{ secrets.VITE_ENTRA_POST_LOGOUT_REDIRECT_URI }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_API_SCOPE: ${{ secrets.VITE_API_SCOPE }}
+          VITE_USE_MOCKS: ${{ secrets.VITE_USE_MOCKS }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
