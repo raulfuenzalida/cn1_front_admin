@@ -1,12 +1,33 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { MsalProvider } from '@azure/msal-react';
+import { MsalProvider, useMsal } from '@azure/msal-react';
 import { msalInstance } from '../config/msalConfig';
 import { ThemeProvider } from '../context/ThemeContext';
 import ProtectedRoute from './ProtectedRoute';
 import AdminLayout from '../layouts/AdminLayout';
 import Login from '../pages/Login/Login';
 import Loading from '../components/common/Loading';
+
+// Componente para manejar el redirect de MSAL
+const RedirectHandler = () => {
+  const { inProgress, instance } = useMsal();
+
+  useEffect(() => {
+    const handleRedirect = async () => {
+      if (inProgress === 'handleRedirect') {
+        try {
+          await instance.handleRedirectPromise();
+        } catch (error) {
+          console.error('Error handling redirect:', error);
+        }
+      }
+    };
+
+    handleRedirect();
+  }, [inProgress, instance]);
+
+  return null;
+};
 
 // Lazy loading de páginas administrativas y de error
 const Dashboard = lazy(() => import('../pages/Dashboard/Dashboard'));
@@ -34,6 +55,7 @@ const AppRoutes = () => {
     <MsalProvider instance={msalInstance}>
       <ThemeProvider>
         <Router basename="/cn1_front_admin">
+          <RedirectHandler />
           <Suspense fallback={<Loading />}>
             <Routes>
               {/* Ruta pública - Login */}
