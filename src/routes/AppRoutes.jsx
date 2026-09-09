@@ -54,7 +54,7 @@ const AppRoutes = () => {
   return (
     <MsalProvider instance={msalInstance}>
       <ThemeProvider>
-        <Router basename="/cn1_front_admin">
+        <Router>
           <RedirectHandler />
           <Suspense fallback={<Loading />}>
             <Routes>
