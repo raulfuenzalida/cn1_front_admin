@@ -10,6 +10,7 @@ import Loading from '../components/common/Loading';
 
 // Lazy loading de páginas administrativas y de error
 const Dashboard = lazy(() => import('../pages/Dashboard/Dashboard'));
+const Configuration = lazy(() => import('../pages/Configuration/Configuration'));
 const Unauthorized = lazy(() => import('../pages/Unauthorized/Unauthorized'));
 const NotFound = lazy(() => import('../pages/NotFound/NotFound'));
 
@@ -51,7 +52,7 @@ const AppRoutes = () => {
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="products" element={<div className="p-4">Productos (próximamente)</div>} />
                 <Route path="orders" element={<div className="p-4">Pedidos (próximamente)</div>} />
-                <Route path="configuration" element={<div className="p-4">Configuración (próximamente)</div>} />
+                <Route path="configuration" element={<Configuration />} />
               </Route>
 
               {/* Rutas de error */}

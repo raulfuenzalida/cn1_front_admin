@@ -1,4 +1,4 @@
-import { msalInstance, loginRequest } from '../config/msalConfig';
+import { msalInstance, loginRequest, apiScope } from '../config/msalConfig';
 
 /**
  * Servicio de autenticación centralizado
@@ -71,8 +71,12 @@ export const authService = {
   /**
    * Adquiere un token de acceso para la API de PrintWorks
    * 
-   * NOTA: Esta función se completará cuando exista la configuración
-   * del scope específico de API Gateway. Por ahora usa el scope de Graph.
+   * Esta función obtiene el Access Token destinado a la API PrintWorks.
+   * Cuando VITE_API_SCOPE esté configurado (Expose an API en Entra ID),
+   * se solicitará el scope propio. Mientras tanto, se usa User.Read temporalmente.
+   * 
+   * @returns {Promise<string>} Access Token
+   * @throws {Error} Si no hay cuenta autenticada o falla la adquisición
    */
   acquireApiToken: async () => {
     try {
@@ -81,9 +85,12 @@ export const authService = {
         throw new Error('No hay cuenta autenticada');
       }
 
+      // Usar VITE_API_SCOPE si está configurado, sino usar User.Read temporalmente
+      const scopes = apiScope ? [apiScope] : loginRequest.scopes;
+
       // Intentar adquisición silenciosa
       const silentRequest = {
-        scopes: loginRequest.scopes,
+        scopes: scopes,
         account: account,
       };
 
@@ -91,7 +98,21 @@ export const authService = {
       return tokenResponse.accessToken;
     } catch (error) {
       console.error('Error adquiriendo token:', error);
-      // Si falla el modo silencioso, se podría intentar interacción
+      
+      // Si el error es InteractionRequiredAuthError, intentar interacción
+      if (error.name === 'InteractionRequiredAuthError') {
+        try {
+          const interactiveRequest = {
+            scopes: apiScope ? [apiScope] : loginRequest.scopes,
+          };
+          const tokenResponse = await msalInstance.acquireTokenPopup(interactiveRequest);
+          return tokenResponse.accessToken;
+        } catch (interactiveError) {
+          console.error('Error en adquisición interactiva:', interactiveError);
+          throw interactiveError;
+        }
+      }
+      
       throw error;
     }
   },

@@ -9,10 +9,12 @@ vi.mock('../../config/msalConfig', () => ({
     logoutRedirect: vi.fn(),
     getAllAccounts: vi.fn(),
     acquireTokenSilent: vi.fn(),
+    acquireTokenPopup: vi.fn(),
   },
   loginRequest: {
     scopes: ['User.Read'],
   },
+  apiScope: null,
 }));
 
 describe('authService', () => {
@@ -139,13 +141,57 @@ describe('authService', () => {
       await expect(authService.acquireApiToken()).rejects.toThrow('No hay cuenta autenticada');
     });
 
-    it('debería lanzar error si acquireTokenSilent falla', async () => {
+    it('debería lanzar error si acquireTokenSilent falla con error genérico', async () => {
       const mockAccount = { name: 'Test User' };
       const mockError = new Error('Token acquisition failed');
       msalInstance.getAllAccounts.mockReturnValue([mockAccount]);
       msalInstance.acquireTokenSilent.mockRejectedValue(mockError);
 
       await expect(authService.acquireApiToken()).rejects.toThrow('Token acquisition failed');
+    });
+
+    it('debería intentar adquisición interactiva si InteractionRequiredAuthError', async () => {
+      const mockAccount = { name: 'Test User' };
+      const mockToken = 'mock-access-token-interactive';
+      const interactionError = new Error('Interaction required');
+      interactionError.name = 'InteractionRequiredAuthError';
+      
+      msalInstance.getAllAccounts.mockReturnValue([mockAccount]);
+      msalInstance.acquireTokenSilent.mockRejectedValue(interactionError);
+      msalInstance.acquireTokenPopup.mockResolvedValue({ accessToken: mockToken });
+
+      const result = await authService.acquireApiToken();
+
+      expect(msalInstance.acquireTokenPopup).toHaveBeenCalled();
+      expect(result).toBe(mockToken);
+    });
+
+    it('debería lanzar error si adquisición interactiva falla', async () => {
+      const mockAccount = { name: 'Test User' };
+      const interactionError = new Error('Interaction required');
+      interactionError.name = 'InteractionRequiredAuthError';
+      const interactiveError = new Error('Interactive failed');
+      
+      msalInstance.getAllAccounts.mockReturnValue([mockAccount]);
+      msalInstance.acquireTokenSilent.mockRejectedValue(interactionError);
+      msalInstance.acquireTokenPopup.mockRejectedValue(interactiveError);
+
+      await expect(authService.acquireApiToken()).rejects.toThrow('Interactive failed');
+    });
+
+    it('debería usar accessToken, no idToken como token definitivo', async () => {
+      const mockAccount = { name: 'Test User' };
+      const mockToken = 'mock-access-token';
+      msalInstance.getAllAccounts.mockReturnValue([mockAccount]);
+      msalInstance.acquireTokenSilent.mockResolvedValue({ 
+        accessToken: mockToken,
+        idToken: 'mock-id-token' 
+      });
+
+      const result = await authService.acquireApiToken();
+
+      expect(result).toBe(mockToken);
+      expect(result).not.toBe('mock-id-token');
     });
   });
 });
