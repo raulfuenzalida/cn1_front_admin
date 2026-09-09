@@ -28,9 +28,9 @@ Este componente es responsable de:
 - Dashboard con vista general del estado operativo
 - Autenticación administrativa mediante Microsoft Entra ID
 
-Las solicitudes protegidas serán enviadas mediante **AWS API Gateway** hacia el **BFF**, incluyendo el token JWT obtenido desde Microsoft Entra ID.
+Las solicitudes protegidas se envían directamente a los microservicios o mediante **AWS API Gateway** en producción, incluyendo el token JWT obtenido desde Microsoft Entra ID.
 
-El **BFF será responsable de validar el token del usuario** antes de permitir el acceso a las operaciones protegidas y comunicarse con los microservicios correspondientes.
+El frontend es responsable de obtener el Access Token y enviarlo en las solicitudes HTTP.
 
 ---
 
@@ -148,14 +148,14 @@ La configuración esperada es:
 
 ```env
 # Microsoft Entra ID / MSAL Configuration
-VITE_ENTRA_CLIENT_ID=your-client-id-here
-VITE_ENTRA_TENANT_ID=your-tenant-id-here
+VITE_ENTRA_CLIENT_ID=REEMPLAZAR
+VITE_ENTRA_TENANT_ID=REEMPLAZAR
 VITE_ENTRA_REDIRECT_URI=http://localhost:5173
 VITE_ENTRA_POST_LOGOUT_REDIRECT_URI=http://localhost:5173
 
 # API Configuration
-VITE_API_BASE_URL=https://your-api-gateway-url.com
-VITE_API_SCOPE=api://your-api-scope
+VITE_API_BASE_URL=http://localhost:8080
+VITE_API_SCOPE=api://80bf85e9-a444-4754-b780-c65dfff74876/access_as_user
 
 # Mock Mode
 VITE_USE_MOCKS=true
@@ -179,6 +179,18 @@ VITE_USE_MOCKS=false
 
 para realizar llamadas reales mediante la capa de servicios.
 
+### Access Token vs ID Token
+
+La API definitiva utiliza:
+
+```http
+Authorization: Bearer <access_token>
+```
+
+El frontend debe obtener un **Access Token destinado a la API PrintWorks**. No utilizar `tokenResult.idToken` como solución definitiva ni utilizar un Access Token destinado a Microsoft Graph como token de PrintWorks.
+
+Cuando `Expose an API` esté configurado en Entra ID, debe solicitarse el scope propio y utilizar `tokenResult.accessToken`. Mientras no exista el scope oficial, `VITE_API_SCOPE` permanece preparado pero el frontend queda bloqueado para producción.
+
 ---
 
 ## Configuración de MSAL / Microsoft Entra ID
@@ -200,7 +212,8 @@ La autenticación administrativa utiliza Microsoft Entra ID mediante MSAL.
    URL utilizada después de cerrar sesión.
 
 5. **VITE_API_SCOPE**  
-   Scope utilizado para solicitar el token que posteriormente será enviado al backend.
+   Scope utilizado para solicitar el Access Token para la API de PrintWorks.  
+   Debe configurarse cuando exista la configuración "Expose an API" en Entra ID.
 
 ### Configuración básica en Entra ID
 
@@ -214,6 +227,7 @@ La autenticación administrativa utiliza Microsoft Entra ID mediante MSAL.
 6. En **Authentication**, configurar la aplicación como **Single-page application (SPA)**.
 7. Registrar las URI de redirección correspondientes.
 8. Configurar los permisos y scopes requeridos por la aplicación.
+9. Para producción, configurar "Expose an API" para definir el scope propio de PrintWorks.
 
 ---
 
@@ -247,32 +261,26 @@ El frontend obtiene el token mediante la capa de autenticación y posteriormente
 
 ## Flujo de Comunicación con Backend
 
-La arquitectura prevista para las solicitudes protegidas es:
+La arquitectura para las solicitudes protegidas es:
 
 ```text
 Frontend Admin
       |
+      | MSAL + Microsoft Entra ID
+      | Access Token
       v
-authService.acquireApiToken()
-      |
-      v
-apiClient
-(Bearer JWT)
+API Gateway / URL local configurada
       |
       v
-AWS API Gateway
+cn1_ms_config
       |
+      | OAuth2 Resource Server
+      | valida Access Token
       v
-BFF
-      |
-      +--> Validación del token
-      |
-      +--> ms-config
-      |
-      +--> ms-products
-      |
-      `--> ms-orders
+config_db
 ```
+
+En desarrollo local el frontend puede apuntar directamente a `cn1_ms_config` mediante `VITE_API_BASE_URL`. En AWS la misma abstracción apuntará a API Gateway.
 
 ### Responsabilidades
 
@@ -281,38 +289,26 @@ BFF
 El frontend es responsable de:
 
 - Autenticar al usuario mediante Microsoft Entra ID
-- Obtener el token mediante MSAL
+- Obtener el Access Token mediante MSAL
 - Mantener las rutas administrativas protegidas
-- Adjuntar el token a las solicitudes HTTP
-- Consumir las operaciones expuestas por el BFF
+- Adjuntar el token a las solicitudes HTTP como `Authorization: Bearer <access_token>`
+- Consumir las operaciones expuestas por los microservicios
 
-#### AWS API Gateway
+#### API Gateway (AWS)
 
 API Gateway será el punto de entrada hacia los servicios backend desplegados en AWS.
 
-#### BFF
-
-El BFF será responsable de:
-
-- Recibir las solicitudes provenientes del frontend
-- Validar el token del usuario
-- Rechazar solicitudes no autorizadas
-- Centralizar las operaciones requeridas por el frontend
-- Comunicarse con los microservicios correspondientes
-
 #### Microservicios
 
-Los microservicios implementarán la lógica de negocio correspondiente a cada dominio.
+Los microservicios implementarán la lógica de negocio correspondiente a cada dominio y actúan como OAuth2 Resource Servers, validando el Access Token.
 
 Actualmente se consideran:
 
 ```text
+ms-config (cn1_ms_config)
 ms-products
 ms-orders
-ms-config
 ```
-
-> La implementación definitiva de la validación del token dentro del BFF y los servicios se realizará siguiendo el ejemplo y lineamientos entregados por el profesor durante las siguientes clases.
 
 ---
 
@@ -624,7 +620,7 @@ El Front Admin cuenta actualmente con la base técnica, visual, de autenticació
   - Logout
   - Rutas protegidas
   - Obtención de información del usuario
-  - Preparación para obtención del token de API
+  - Implementación de `acquireApiToken()` con `VITE_API_SCOPE`
 
 - ✅ **Fase D:** Dashboard mock
   - Datos obtenidos mediante capa de servicios
@@ -633,15 +629,37 @@ El Front Admin cuenta actualmente con la base técnica, visual, de autenticació
   - Estados operativos
   - Sección de atención/revisión
 
+- ✅ **Fase E:** Integración cn1_ms_config (Configuration)
+  - Implementación de `configService` con endpoints reales
+  - Página `/configuration` con UI completa
+  - Gestión de filamentos (CRUD sin DELETE físico)
+  - Configuración energética
+  - Validaciones UX y manejo de errores
+  - Estados de UI (loading, empty, error, success)
+
+- ✅ **Fase F:** Testing
+  - Pruebas de `authService` (incluyendo acquireApiToken)
+  - Pruebas de `apiClient` (incluyendo normalización de errores HTTP)
+  - Pruebas de `configService` (endpoints contratados)
+  - 59 tests pasando
+
+- ✅ **Fase H:** Cierre
+  - Tests pasando (59/59)
+  - Build de producción exitoso
+  - README actualizado
+  - .env.example sin secretos
+  - Sin referencias arquitectónicas activas al BFF
+
 ### Infraestructura preparada
 
 También se encuentra implementada la infraestructura necesaria para continuar con Productos, Pedidos y Configuración:
 
-- ✅ `apiClient.js`
+- ✅ `apiClient.js` (integración real con cn1_ms_config)
+- ✅ `authService.js` (acquireApiToken implementado)
 - ✅ `dashboardService.js`
 - ✅ `productService.js`
 - ✅ `orderService.js`
-- ✅ `configService.js`
+- ✅ `configService.js` (endpoints reales implementados)
 - ✅ Mocks de Dashboard
 - ✅ Mocks de Productos
 - ✅ Mocks de Pedidos
@@ -649,94 +667,45 @@ También se encuentra implementada la infraestructura necesaria para continuar c
 - ✅ Utilidades de moneda
 - ✅ Utilidades de fechas
 - ✅ Utilidades de estados
-- ✅ Variables de entorno
+- ✅ Variables de entorno actualizadas
 - ✅ Modo mock configurable
 - ✅ Lazy loading
 - ✅ Code splitting
 - ✅ Build de producción funcional
 
----
+### Próximos pasos según PLAN_FRONTEND_ADMIN_v1.2.md
 
-## Próximos pasos
+El módulo de Configuración está completamente integrado con `cn1_ms_config`. Los siguientes pasos dependen de la disponibilidad de los microservicios restantes:
 
-### Fase E - Productos
+- ✅ Fase G: Integración local con `cn1_ms_config` (validada con éxito)
+- [ ] Implementación de Productos (cuando `ms-products` esté disponible)
+- [ ] Implementación de Pedidos (cuando `ms-orders` esté disponible)
+- ✅ Configuración de `Expose an API` en Entra ID para usar Access Token definitivo
 
-Implementar la interfaz completa de administración de productos:
+### Endpoints de Configuración
 
-- Listado
-- Búsqueda
-- Filtros
-- Creación
-- Edición
-- Visualización de detalle
-- Estados ACTIVE / INACTIVE
-- Gestión visual de precios
-- Integración con `productService`
-
-### Fase F - Pedidos
-
-Implementar:
-
-- Listado de pedidos
-- Búsqueda
-- Filtros
-- Detalle del pedido
-- Visualización de estados
-- Acciones permitidas según estado
-- Integración con `orderService`
-
-Estados contemplados:
+El módulo de Configuración consume los siguientes endpoints de `cn1_ms_config`:
 
 ```text
-CREATED
-CONFIRMED
-COMPLETED
-CANCELLED
+GET    /api/v1/config/filaments
+GET    /api/v1/config/filaments/{id}
+POST   /api/v1/config/filaments
+PUT    /api/v1/config/filaments/{id}
+PATCH  /api/v1/config/filaments/{id}/status
+GET    /api/v1/config/printing
+PUT    /api/v1/config/printing
 ```
 
-### Fase G - Configuración
+### Manejo de Errores HTTP
 
-Implementar:
+El frontend maneja los siguientes códigos de estado:
 
-- Gestión de filamentos
-- Costos de materiales
-- Configuración de costos energéticos
-- Parámetros utilizados para cálculo de precios
-- Integración con `configService`
-
-### Fase H - Pruebas
-
-Ampliar la cobertura de pruebas:
-
-- Servicios
-- Utilidades
-- Componentes
-- Páginas
-- Rutas protegidas
-- Estados de carga
-- Estados de error
-- Funcionalidades CRUD
-
-Antes de integrar cambios deberán ejecutarse:
-
-```bash
-npm run test
-npm run build
-```
-
-### Fase I - Integración Backend
-
-Una vez disponibles los servicios backend:
-
-- Reemplazar progresivamente mocks por llamadas reales
-- Configurar `VITE_API_BASE_URL`
-- Conectar `apiClient` con AWS API Gateway
-- Obtener token mediante MSAL
-- Enviar token como `Authorization: Bearer <token>`
-- Conectar AWS API Gateway con el BFF
-- Validar el token en el BFF
-- Integrar el BFF con los microservicios
-- Manejar errores HTTP y respuestas no autorizadas
+- **400** - Datos inválidos en la solicitud
+- **401** - Token expirado o inválido, requiere atención de sesión
+- **403** - Acceso no autorizado
+- **404** - Recurso inexistente
+- **409** - Conflicto (ej: filamento duplicado)
+- **5xx** - Error temporal del servidor
 
 ---
 

@@ -1,10 +1,10 @@
-import { Container, Row, Col, Card } from 'react-bootstrap';
+import { Container, Row, Col, Card, Alert } from 'react-bootstrap';
 
 /**
  * Página Dashboard de PrintWorks Admin
  * 
  * Muestra una vista rápida del estado operativo.
- * Durante esta fase, los datos son estáticos de demostración.
+ * Los datos estarán disponibles cuando se implementen ms-products y ms-orders.
  */
 const Dashboard = () => {
   return (
@@ -14,11 +14,20 @@ const Dashboard = () => {
         <p className="page-subtitle">Vista general del estado operativo</p>
       </div>
 
+      <Alert variant="info">
+        <Alert.Heading>Dashboard en desarrollo</Alert.Heading>
+        <p className="mb-0">
+          El Dashboard estará disponible cuando se implementen los microservicios 
+          <strong>ms-products</strong> y <strong>ms-orders</strong>. 
+          Por ahora, utilice la sección de <strong>Configuración</strong> para gestionar filamentos y parámetros energéticos.
+        </p>
+      </Alert>
+
       <Row className="g-4 mb-4">
         <Col xs={12} md={6} lg={3}>
           <Card className="stat-card h-100">
             <Card.Body>
-              <h3 className="stat-value">12</h3>
+              <h3 className="stat-value text-muted">-</h3>
               <p className="stat-label">Productos activos</p>
             </Card.Body>
           </Card>
@@ -26,7 +35,7 @@ const Dashboard = () => {
         <Col xs={12} md={6} lg={3}>
           <Card className="stat-card h-100">
             <Card.Body>
-              <h3 className="stat-value">3</h3>
+              <h3 className="stat-value text-muted">-</h3>
               <p className="stat-label">Productos inactivos</p>
             </Card.Body>
           </Card>
@@ -34,7 +43,7 @@ const Dashboard = () => {
         <Col xs={12} md={6} lg={3}>
           <Card className="stat-card h-100">
             <Card.Body>
-              <h3 className="stat-value">2</h3>
+              <h3 className="stat-value text-muted">-</h3>
               <p className="stat-label">Precios desactualizados</p>
             </Card.Body>
           </Card>
@@ -42,7 +51,7 @@ const Dashboard = () => {
         <Col xs={12} md={6} lg={3}>
           <Card className="stat-card h-100">
             <Card.Body>
-              <h3 className="stat-value">5</h3>
+              <h3 className="stat-value text-muted">-</h3>
               <p className="stat-label">Pedidos pendientes</p>
             </Card.Body>
           </Card>
