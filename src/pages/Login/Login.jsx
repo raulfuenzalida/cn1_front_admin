@@ -2,33 +2,29 @@ import { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Spinner, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
+import { InteractionStatus } from '@azure/msal-browser';
 import { authService } from '../../services/authService';
 
 /**
  * Página de Login para PrintWorks Admin
- * 
+ *
  * Utiliza MSAL para autenticación con Microsoft Entra ID mediante redirect.
  * No existe autenticación local con email/password.
- * 
- * Flujo:
- * 1. Usuario hace clic en "Iniciar sesión con Microsoft"
- * 2. loginRedirect() redirige a Microsoft Entra ID
- * 3. Después de autenticarse, Entra ID redirige de vuelta a la aplicación
- * 4. MSAL procesa la respuesta y establece la cuenta
- * 5. ProtectedRoute detecta autenticación y redirige al dashboard
+ *
+ * La navegación al dashboard se basa en el estado reactivo de MsalProvider
+ * (accounts + inProgress), no en una consulta puntual a authService.
  */
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const { instance, inProgress } = useMsal();
+  const { accounts, inProgress } = useMsal();
 
-  // Si ya está autenticado, redirigir al dashboard
   useEffect(() => {
-    if (authService.isAuthenticated() && inProgress === 'none') {
-      navigate('/dashboard');
+    if (accounts.length > 0 && inProgress === InteractionStatus.None) {
+      navigate('/dashboard', { replace: true });
     }
-  }, [inProgress, navigate]);
+  }, [accounts, inProgress, navigate]);
 
   const handleLogin = async () => {
     setIsLoading(true);
@@ -36,14 +32,15 @@ const Login = () => {
 
     try {
       await authService.login();
-      // loginRedirect() redirige a Microsoft Entra ID
-      // El flujo continúa cuando MSAL procesa el redirect de vuelta
     } catch (err) {
       setError('Error al iniciar sesión. Por favor, inténtelo nuevamente.');
       console.error('Login error:', err);
       setIsLoading(false);
     }
   };
+
+  const interactionBusy = inProgress !== InteractionStatus.None;
+  const buttonDisabled = isLoading || interactionBusy;
 
   return (
     <Container className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
@@ -70,9 +67,9 @@ const Login = () => {
                 size="lg"
                 className="w-100"
                 onClick={handleLogin}
-                disabled={isLoading}
+                disabled={buttonDisabled}
               >
-                {isLoading ? (
+                {buttonDisabled ? (
                   <>
                     <Spinner
                       as="span"

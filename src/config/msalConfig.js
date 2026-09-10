@@ -8,12 +8,26 @@ import { PublicClientApplication } from '@azure/msal-browser';
  * @see https://learn.microsoft.com/en-us/entra/identity-platform/msal-js-initializing-client-applications
  */
 
+/**
+ * Entra ID no debe recibir un fragmento de HashRouter (#/dashboard, #/login).
+ * MSAL usa el hash de la URL para la respuesta OAuth; incluir una ruta de
+ * React ahí hace que el redirect se pierda o que la app vuelva a /login.
+ */
+const stripHash = (uri) => (uri ? String(uri).split('#')[0] : uri);
+
+const fallbackRedirectUri =
+  typeof window !== 'undefined'
+    ? `${window.location.origin}${import.meta.env.BASE_URL}`
+    : undefined;
+
 const msalConfig = {
   auth: {
     clientId: import.meta.env.VITE_ENTRA_CLIENT_ID,
     authority: `https://login.microsoftonline.com/${import.meta.env.VITE_ENTRA_TENANT_ID}`,
-    redirectUri: import.meta.env.VITE_ENTRA_REDIRECT_URI,
-    postLogoutRedirectUri: import.meta.env.VITE_ENTRA_POST_LOGOUT_REDIRECT_URI,
+    redirectUri: stripHash(import.meta.env.VITE_ENTRA_REDIRECT_URI) || fallbackRedirectUri,
+    postLogoutRedirectUri:
+      stripHash(import.meta.env.VITE_ENTRA_POST_LOGOUT_REDIRECT_URI) || fallbackRedirectUri,
+    navigateToLoginRequestUrl: false,
   },
   cache: {
     cacheLocation: 'sessionStorage',
