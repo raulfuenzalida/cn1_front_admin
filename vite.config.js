@@ -5,6 +5,24 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   base: '/cn1_front_admin/',
   plugins: [react()],
+
+  server: {
+    proxy: {
+      '/api/v1/config': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/api/v1/products': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+      },
+      '/api/v1/tags': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+      },
+    },
+  },
+
   build: {
     rollupOptions: {
       output: {
@@ -30,6 +48,7 @@ export default defineConfig({
       },
     },
   },
+
   test: {
     globals: true,
     environment: 'jsdom',
