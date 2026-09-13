@@ -1,14 +1,21 @@
 # PrintWorks Admin
 
-Panel de administración de PrintWorks, aplicación web que simula un emprendimiento de impresión 3D.
+Panel de administración de PrintWorks, aplicación web para la gestión de un emprendimiento de impresión 3D.
 
 ## Descripción
 
 `cn1_front_admin` es el frontend administrativo de PrintWorks, diseñado para gestionar productos, pedidos y configuración del sistema.
 
-La aplicación utiliza **Microsoft Entra ID** mediante **MSAL** para la autenticación de los usuarios administrativos.
+La aplicación utiliza **Microsoft Entra ID** mediante **MSAL** para autenticar a los usuarios administrativos y obtener el Access Token utilizado en las solicitudes protegidas hacia los microservicios.
 
-Durante el desarrollo, el frontend puede trabajar utilizando datos mock, permitiendo implementar y probar las funcionalidades sin depender de que los servicios backend se encuentren disponibles.
+Actualmente se encuentra integrado con:
+
+- `cn1_ms_config`
+- `cn1_ms_products`
+
+La integración con `ms-orders` corresponde a una etapa posterior.
+
+Durante el desarrollo, el frontend puede utilizar datos mock mediante configuración, aunque los módulos de Configuración y Productos ya disponen de integración real con sus respectivos microservicios.
 
 ---
 
@@ -16,35 +23,35 @@ Durante el desarrollo, el frontend puede trabajar utilizando datos mock, permiti
 
 Este componente es responsable de:
 
-- Gestión de productos
-- Creación, edición y visualización de productos
-- Cálculo de precios
-- Gestión de imágenes y tags
-- Gestión de pedidos
-- Visualización del estado de los pedidos
-- Confirmación, cancelación y finalización de pedidos
-- Configuración de filamentos
+- Gestión administrativa de productos
+- Creación y edición de productos
+- Activación y desactivación de productos
+- Visualización de precios y costos
+- Recálculo de precios
+- Gestión de filamentos
 - Configuración de costos energéticos
+- Gestión futura de imágenes y tags
+- Gestión futura de pedidos
 - Dashboard con vista general del estado operativo
 - Autenticación administrativa mediante Microsoft Entra ID
 
-Las solicitudes protegidas se envían directamente a los microservicios o mediante **AWS API Gateway** en producción, incluyendo el token JWT obtenido desde Microsoft Entra ID.
+El frontend obtiene un Access Token mediante MSAL y lo envía en las solicitudes HTTP protegidas.
 
-El frontend es responsable de obtener el Access Token y enviarlo en las solicitudes HTTP.
+En producción, las solicitudes utilizan **AWS API Gateway** como punto de entrada hacia los microservicios.
 
 ---
 
 ## Stack Tecnológico
 
-- **React 19.2.8** - Framework frontend
-- **JavaScript** - Sin TypeScript
-- **Bootstrap 5.3.8** - Framework CSS para estructura y componentes
-- **React Bootstrap** - Componentes React de Bootstrap
-- **React Router 7.18.2** - Enrutamiento
-- **MSAL (@azure/msal-browser, @azure/msal-react)** - Autenticación con Microsoft Entra ID
-- **Vitest** - Framework de pruebas
-- **React Testing Library** - Pruebas de componentes
-- **Vite 8.2.2** - Build tool y servidor de desarrollo
+- **React 19.2.8**
+- **JavaScript**
+- **Bootstrap 5.3.8**
+- **React Bootstrap**
+- **React Router 7.18.2**
+- **MSAL (`@azure/msal-browser`, `@azure/msal-react`)**
+- **Vitest**
+- **React Testing Library**
+- **Vite 8.2.2**
 
 ---
 
@@ -55,7 +62,17 @@ Antes de ejecutar el proyecto es necesario contar con:
 - Node.js 18 o superior
 - npm
 - Git
-- Una cuenta de Microsoft Entra ID configurada para autenticación
+- Microsoft Entra ID configurado
+- `cn1_ms_config` para utilizar Configuración real
+- `cn1_ms_products` para utilizar Productos reales
+
+Para desarrollo integrado localmente se utilizan actualmente:
+
+```text
+cn1_front_admin  → localhost:5173
+cn1_ms_config    → localhost:8080
+cn1_ms_products  → localhost:8081
+```
 
 ---
 
@@ -76,15 +93,15 @@ npm install
 
 ### 3. Crear el archivo de variables de entorno
 
-El proyecto incluye un archivo `.env.example` con las variables necesarias.
+El proyecto incluye un archivo `.env.example`.
 
-Crear el archivo `.env` utilizando:
+Crear `.env` utilizando:
 
 ```bash
 cp .env.example .env
 ```
 
-Luego editar `.env` e ingresar los valores correspondientes al entorno local.
+Luego editar `.env` con los valores correspondientes al entorno local.
 
 > El archivo `.env` contiene configuración específica del entorno y no debe subirse al repositorio.
 
@@ -103,6 +120,17 @@ La aplicación estará disponible por defecto en:
 ```text
 http://localhost:5173
 ```
+
+### Backend local
+
+Para utilizar Configuración y Productos sin mocks deben estar ejecutándose:
+
+```text
+ms-config    → http://localhost:8080
+ms-products  → http://localhost:8081
+```
+
+Vite utiliza un proxy de desarrollo para distribuir las solicitudes hacia cada microservicio.
 
 ### Build de producción
 
@@ -132,64 +160,219 @@ npm run preview
 | `npm run build` | Genera el build de producción |
 | `npm run preview` | Previsualiza el build de producción |
 | `npm run test` | Ejecuta las pruebas con Vitest |
-| `npm run lint` | Ejecuta el linter con oxlint |
+| `npm run lint` | Ejecuta el linter |
 
 ---
 
 ## Variables de Entorno
 
-Crear el archivo `.env` a partir de `.env.example`:
+Crear `.env` a partir de `.env.example`:
 
 ```bash
 cp .env.example .env
 ```
 
-La configuración esperada es:
+Las principales variables utilizadas son:
 
 ```env
 # Microsoft Entra ID / MSAL Configuration
 VITE_ENTRA_CLIENT_ID=REEMPLAZAR
 VITE_ENTRA_TENANT_ID=REEMPLAZAR
-VITE_ENTRA_REDIRECT_URI=http://localhost:5173/cn1_front_admin/#/dashboard
-VITE_ENTRA_POST_LOGOUT_REDIRECT_URI=http://localhost:5173/cn1_front_admin/#/login
+VITE_ENTRA_REDIRECT_URI=http://localhost:5173/cn1_front_admin/
+VITE_ENTRA_POST_LOGOUT_REDIRECT_URI=http://localhost:5173/cn1_front_admin/
 
 # API Configuration
-VITE_API_BASE_URL=http://localhost:8080
+# Vacío en desarrollo local para utilizar el proxy de Vite
+VITE_API_BASE_URL=
 VITE_API_SCOPE=api://80bf85e9-a444-4754-b780-c65dfff74876/access_as_user
 
 # Mock Mode
-VITE_USE_MOCKS=true
+# false = utiliza los microservicios reales
+# true = utiliza datos mock cuando estén disponibles
+VITE_USE_MOCKS=false
+```
+
+### Desarrollo local
+
+En desarrollo local:
+
+```env
+VITE_API_BASE_URL=
+VITE_USE_MOCKS=false
+```
+
+`VITE_API_BASE_URL` permanece vacío intencionalmente.
+
+Esto provoca que las solicitudes sean relativas:
+
+```text
+/api/v1/config/...
+/api/v1/products/...
+```
+
+y permite que el servidor de desarrollo de Vite las redirija mediante su proxy.
+
+### Producción
+
+En producción, `VITE_API_BASE_URL` contiene la dirección de AWS API Gateway.
+
+Actualmente el despliegue utiliza:
+
+```text
+https://1335t86sik.execute-api.us-east-1.amazonaws.com
+```
+
+El valor se proporciona durante el build mediante GitHub Secrets:
+
+```text
+VITE_API_BASE_URL
+```
+
+De esta forma, el mismo código puede trabajar:
+
+```text
+LOCAL
+Frontend
+   ↓
+Vite Proxy
+   ├── ms-config :8080
+   └── ms-products :8081
+
+
+PRODUCCIÓN
+GitHub Pages
+   ↓
+API Gateway
+   ↓
+Microservicios AWS
 ```
 
 ### Modo Mock
 
-Durante el desarrollo se puede utilizar:
+El proyecto conserva soporte para mocks mediante:
 
 ```env
 VITE_USE_MOCKS=true
 ```
 
-Esto permite utilizar datos locales sin depender del backend.
-
-Cuando los servicios backend se encuentren disponibles, el frontend podrá utilizar:
+Para utilizar las integraciones reales:
 
 ```env
 VITE_USE_MOCKS=false
 ```
 
-para realizar llamadas reales mediante la capa de servicios.
+Los módulos de Configuración y Productos se encuentran preparados para utilizar los servicios backend reales.
 
-### Access Token vs ID Token
+---
 
-La API definitiva utiliza:
+## Proxy Local de Vite
 
-```http
-Authorization: Bearer <access_token>
+Para permitir que el frontend consuma múltiples microservicios durante desarrollo local, `vite.config.js` contiene un proxy.
+
+Configuración actual:
+
+```js
+server: {
+  proxy: {
+    '/api/v1/config': {
+      target: 'http://localhost:8080',
+      changeOrigin: true,
+    },
+    '/api/v1/products': {
+      target: 'http://localhost:8081',
+      changeOrigin: true,
+    },
+    '/api/v1/tags': {
+      target: 'http://localhost:8081',
+      changeOrigin: true,
+    },
+  },
+},
 ```
 
-El frontend debe obtener un **Access Token destinado a la API PrintWorks**. No utilizar `tokenResult.idToken` como solución definitiva ni utilizar un Access Token destinado a Microsoft Graph como token de PrintWorks.
+Esto permite que el frontend realice solicitudes como:
 
-Cuando `Expose an API` esté configurado en Entra ID, debe solicitarse el scope propio y utilizar `tokenResult.accessToken`. Mientras no exista el scope oficial, `VITE_API_SCOPE` permanece preparado pero el frontend queda bloqueado para producción.
+```text
+/api/v1/config/filaments
+/api/v1/config/printing
+/api/v1/products/admin
+```
+
+sin conocer directamente el puerto de cada microservicio.
+
+El proxy de Vite se utiliza exclusivamente durante:
+
+```bash
+npm run dev
+```
+
+y no forma parte del build estático desplegado en GitHub Pages.
+
+---
+
+## GitHub Pages
+
+El proyecto utiliza:
+
+```js
+base: '/cn1_front_admin/'
+```
+
+para permitir que los assets generados por Vite funcionen correctamente bajo el subdirectorio utilizado por GitHub Pages.
+
+El sitio desplegado se encuentra bajo:
+
+```text
+https://raulfuenzalida.github.io/cn1_front_admin/
+```
+
+El proxy local de Vite no afecta al despliegue de GitHub Pages.
+
+Durante el build de producción, `VITE_API_BASE_URL` se obtiene desde GitHub Secrets y apunta hacia AWS API Gateway.
+
+---
+
+## GitHub Actions
+
+El despliegue hacia GitHub Pages se realiza mediante GitHub Actions.
+
+Durante:
+
+```bash
+npm run build
+```
+
+se proporcionan las variables:
+
+```text
+VITE_ENTRA_CLIENT_ID
+VITE_ENTRA_TENANT_ID
+VITE_ENTRA_REDIRECT_URI
+VITE_ENTRA_POST_LOGOUT_REDIRECT_URI
+VITE_API_BASE_URL
+VITE_API_SCOPE
+VITE_USE_MOCKS
+```
+
+El flujo general es:
+
+```text
+Push a develop
+      ↓
+GitHub Actions
+      ↓
+npm ci
+      ↓
+npm run build
+      ↓
+Variables VITE_* desde GitHub Secrets
+      ↓
+dist/
+      ↓
+GitHub Pages
+```
+
+Las variables `VITE_*` utilizadas por una aplicación frontend forman parte del bundle generado y no deben contener secretos privados.
 
 ---
 
@@ -199,131 +382,320 @@ La autenticación administrativa utiliza Microsoft Entra ID mediante MSAL.
 
 ### Valores requeridos
 
-1. **VITE_ENTRA_CLIENT_ID**  
+1. **VITE_ENTRA_CLIENT_ID**
+
    Application (client) ID de la aplicación registrada en Entra ID.
 
-2. **VITE_ENTRA_TENANT_ID**  
+2. **VITE_ENTRA_TENANT_ID**
+
    Directory (tenant) ID correspondiente al tenant utilizado.
 
 3. **VITE_ENTRA_REDIRECT_URI**
-   URL a la cual Microsoft redirige al usuario después del proceso de autenticación.
-   Debe apuntar a `/dashboard` para redirigir directamente al panel de administración.
+
+   URL utilizada después del proceso de autenticación.
 
 4. **VITE_ENTRA_POST_LOGOUT_REDIRECT_URI**
+
    URL utilizada después de cerrar sesión.
-   Debe apuntar a `/login` para redirigir a la página de inicio de sesión.
 
-5. **VITE_API_SCOPE**  
-   Scope utilizado para solicitar el Access Token para la API de PrintWorks.  
-   Debe configurarse cuando exista la configuración "Expose an API" en Entra ID.
+5. **VITE_API_SCOPE**
 
-### Configuración básica en Entra ID
+   Scope utilizado para solicitar el Access Token destinado a la API de PrintWorks.
 
-1. Acceder al Azure Portal.
-2. Ir a **Microsoft Entra ID**.
-3. Entrar a **App registrations**.
-4. Crear una aplicación o seleccionar la aplicación correspondiente a PrintWorks Admin.
-5. Obtener:
+### Access Token vs ID Token
+
+Las APIs protegidas utilizan:
+
+```http
+Authorization: Bearer <access_token>
+```
+
+El frontend obtiene el Access Token mediante MSAL y utiliza:
+
+```text
+tokenResult.accessToken
+```
+
+El ID Token no se utiliza como sustituto del Access Token.
+
+Tampoco debe utilizarse un Access Token destinado a Microsoft Graph como token para las APIs de PrintWorks.
+
+---
+
+## Configuración básica en Entra ID
+
+1. Acceder a Microsoft Entra ID.
+2. Entrar a **App registrations**.
+3. Seleccionar la aplicación de PrintWorks Admin.
+4. Obtener:
    - Application (client) ID
    - Directory (tenant) ID
-6. En **Authentication**, configurar la aplicación como **Single-page application (SPA)**.
-7. Registrar las URI de redirección correspondientes:
-   - Redirect URI: `http://localhost:5173/cn1_front_admin/#/dashboard` (desarrollo)
-   - Post logout redirect URI: `http://localhost:5173/cn1_front_admin/#/login` (desarrollo)
-   - Para producción, usar las URLs correspondientes del entorno de despliegue con el formato `https://dominio.github.io/repo/#/ruta`
+5. Configurar la aplicación como **Single-page application (SPA)**.
+6. Registrar las URI de redirección necesarias.
+7. Configurar el scope utilizado por la API de PrintWorks.
+8. Mantener sincronizadas las URLs de producción con las variables utilizadas por GitHub Actions.
 
-> **Nota para GitHub Pages:** Esta aplicación usa HashRouter para funcionar correctamente en servidores estáticos como GitHub Pages. Las URLs incluyen `#/` antes de las rutas (ej: `#/dashboard`).
-8. Configurar los permisos y scopes requeridos por la aplicación.
+La aplicación utiliza `HashRouter` para mantener compatibilidad con GitHub Pages.
 
-> **Nota importante:** Al actualizar las URLs de redirección en Entra ID, también deben actualizarse los secrets en GitHub Actions (VITE_ENTRA_REDIRECT_URI y VITE_ENTRA_POST_LOGOUT_REDIRECT_URI) para el despliegue en producción.
-9. Para producción, configurar "Expose an API" para definir el scope propio de PrintWorks.
+Ejemplo:
+
+```text
+https://raulfuenzalida.github.io/cn1_front_admin/#/dashboard
+```
 
 ---
 
 ## Flujo de Autenticación
 
-El Front Admin utiliza MSAL para realizar el proceso de autenticación mediante Microsoft Entra ID.
-
-El flujo esperado es:
-
 ```text
 Usuario
-   |
-   v
+   ↓
 PrintWorks Admin
-   |
-   v
+   ↓
 Microsoft Entra ID
-   |
-   | Autenticación
-   |
-   v
-Token JWT
-   |
-   v
+   ↓
+Autenticación
+   ↓
+Access Token
+   ↓
 PrintWorks Admin
+   ↓
+Solicitud HTTP
+Authorization: Bearer <access_token>
 ```
 
-El frontend obtiene el token mediante la capa de autenticación y posteriormente lo utiliza para realizar solicitudes protegidas.
+`authService` es responsable de obtener el token utilizado posteriormente por `apiClient`.
 
 ---
 
 ## Flujo de Comunicación con Backend
 
-La arquitectura para las solicitudes protegidas es:
+### Desarrollo local
 
 ```text
-Frontend Admin
-      |
-      | MSAL + Microsoft Entra ID
-      | Access Token
-      v
-API Gateway / URL local configurada
-      |
-      v
-cn1_ms_config
-      |
-      | OAuth2 Resource Server
-      | valida Access Token
-      v
-config_db
+                     ┌──────────────────┐
+                     │   Front Admin    │
+                     │ localhost:5173   │
+                     └────────┬─────────┘
+                              │
+                         Vite Proxy
+                    ┌─────────┴─────────┐
+                    │                   │
+                    ▼                   ▼
+             ┌─────────────┐     ┌─────────────┐
+             │  ms-config  │     │ ms-products │
+             │    :8080    │     │    :8081    │
+             └─────────────┘     └─────────────┘
 ```
 
-En desarrollo local el frontend puede apuntar directamente a `cn1_ms_config` mediante `VITE_API_BASE_URL`. En AWS la misma abstracción apuntará a API Gateway.
-
-### Responsabilidades
-
-#### Frontend Admin
-
-El frontend es responsable de:
-
-- Autenticar al usuario mediante Microsoft Entra ID
-- Obtener el Access Token mediante MSAL
-- Mantener las rutas administrativas protegidas
-- Adjuntar el token a las solicitudes HTTP como `Authorization: Bearer <access_token>`
-- Consumir las operaciones expuestas por los microservicios
-
-#### API Gateway (AWS)
-
-API Gateway será el punto de entrada hacia los servicios backend desplegados en AWS.
-
-#### Microservicios
-
-Los microservicios implementarán la lógica de negocio correspondiente a cada dominio y actúan como OAuth2 Resource Servers, validando el Access Token.
-
-Actualmente se consideran:
+Las rutas determinan automáticamente el microservicio correspondiente:
 
 ```text
-ms-config (cn1_ms_config)
-ms-products
-ms-orders
+/api/v1/config/*    → ms-config
+/api/v1/products/*  → ms-products
+/api/v1/tags/*      → ms-products
 ```
+
+### Producción
+
+```text
+PrintWorks Admin
+GitHub Pages
+      ↓
+Microsoft Entra ID
+      ↓
+Access Token
+      ↓
+API Gateway
+      ↓
+Microservicios en AWS
+```
+
+El frontend no necesita conocer directamente la dirección individual de cada microservicio en producción.
+
+---
+
+## Integración con cn1_ms_config
+
+El módulo de Configuración consume los siguientes endpoints:
+
+```text
+GET    /api/v1/config/filaments
+GET    /api/v1/config/filaments/{id}
+POST   /api/v1/config/filaments
+PUT    /api/v1/config/filaments/{id}
+PATCH  /api/v1/config/filaments/{id}/status
+
+GET    /api/v1/config/printing
+PUT    /api/v1/config/printing
+```
+
+Actualmente permite:
+
+- Listar filamentos
+- Crear filamentos
+- Editar filamentos
+- Activar/desactivar filamentos
+- Consultar configuración energética
+- Modificar precio de electricidad
+- Modificar consumo energético de impresora
+- Mostrar estados de carga
+- Mostrar errores de API
+
+Los cambios de costos son procesados posteriormente por los microservicios backend para invalidar los precios correspondientes.
+
+---
+
+## Integración con cn1_ms_products
+
+El módulo de Productos se encuentra integrado con `cn1_ms_products`.
+
+### Endpoints utilizados
+
+```text
+GET    /api/v1/products/admin
+GET    /api/v1/products/admin/{id}
+POST   /api/v1/products
+PUT    /api/v1/products/{id}
+PATCH  /api/v1/products/{id}/status
+POST   /api/v1/products/{id}/recalculate
+POST   /api/v1/products/recalculate-outdated
+```
+
+### Funcionalidades implementadas
+
+- Listado real de productos
+- Creación de productos
+- Edición de productos
+- Selección de filamentos obtenidos desde `ms-config`
+- Edición de filamento
+- Edición de gramos de filamento
+- Edición de horas de impresión
+- Edición de porcentaje de ganancia
+- Activación y desactivación
+- Visualización del precio calculado
+- Visualización de estado comercial
+- Visualización de vigencia del precio
+- Recálculo individual de precios
+
+### Estados de precio
+
+La interfaz reconoce:
+
+```text
+CURRENT
+OUTDATED
+```
+
+Un producto desactualizado puede requerir recálculo antes de volver a publicarse.
+
+El flujo administrativo es:
+
+```text
+ACTIVE + CURRENT
+        ↓
+cambio de costos
+        ↓
+INACTIVE + OUTDATED
+        ↓
+Recalcular
+        ↓
+INACTIVE + CURRENT
+        ↓
+revisión administrativa
+        ↓
+Activar
+        ↓
+ACTIVE + CURRENT
+```
+
+El frontend no calcula el precio directamente.
+
+Toda la lógica de cálculo permanece en:
+
+```text
+cn1_ms_products
+```
+
+---
+
+## Arquitectura de Acceso a Datos
+
+Las páginas y componentes no realizan directamente las solicitudes HTTP.
+
+```text
+Pages / Components
+        ↓
+     Services
+        ↓
+    apiClient
+        ↓
+ Backend API
+```
+
+Los principales servicios son:
+
+```text
+authService.js
+apiClient.js
+dashboardService.js
+productService.js
+orderService.js
+configService.js
+```
+
+### apiClient
+
+`apiClient` centraliza:
+
+- URL base
+- Access Token
+- Header `Authorization`
+- Solicitudes HTTP
+- Manejo y normalización de errores
+
+### configService
+
+Gestiona la comunicación con:
+
+```text
+/api/v1/config/*
+```
+
+### productService
+
+Gestiona operaciones como:
+
+```text
+GET    /api/v1/products/admin
+GET    /api/v1/products/admin/{id}
+POST   /api/v1/products
+PUT    /api/v1/products/{id}
+PATCH  /api/v1/products/{id}/status
+POST   /api/v1/products/{id}/recalculate
+POST   /api/v1/products/recalculate-outdated
+```
+
+---
+
+## Manejo de Errores HTTP
+
+El frontend contempla respuestas como:
+
+- **400** - Datos inválidos
+- **401** - Token expirado o inválido
+- **403** - Acceso no autorizado
+- **404** - Recurso inexistente
+- **409** - Conflicto
+- **5xx** - Error del servidor o servicio no disponible
+
+Los errores son normalizados mediante `apiClient` antes de ser utilizados por las páginas.
 
 ---
 
 ## Sistema Visual
 
-PrintWorks utiliza variables CSS semánticas para evitar acoplar directamente los componentes a colores específicos.
+PrintWorks utiliza variables CSS semánticas para evitar acoplar los componentes directamente a colores específicos.
 
 Ejemplos:
 
@@ -338,11 +710,7 @@ Ejemplos:
 --pw-accent
 ```
 
-Esto permite que los componentes utilicen colores según su función dentro de la interfaz.
-
 ### Paleta oficial PrintWorks
-
-La paleta base definida para PrintWorks es:
 
 - `#606c38` - Primary
 - `#283618` - Primary Dark
@@ -350,25 +718,19 @@ La paleta base definida para PrintWorks es:
 - `#dda15e` - Accent
 - `#bc6c25` - Accent Strong
 
-El sistema visual utiliza estos colores mediante tokens semánticos, evitando utilizar valores hexadecimales directamente en los componentes.
-
 ---
 
 ## Temas Light y Dark
 
 PrintWorks Admin soporta temas claro y oscuro.
 
-El sistema utiliza los mismos tokens semánticos y modifica sus valores dependiendo del tema seleccionado.
-
 Características:
 
-- Persistencia de la preferencia del usuario
-- Almacenamiento mediante `localStorage`
-- Clave utilizada: `printworks-theme`
+- Persistencia mediante `localStorage`
+- Clave `printworks-theme`
 - Detección de `prefers-color-scheme`
-- Selector visual para cambiar entre Light y Dark
-- Aplicación inmediata sin recargar la página
-- Contraste adecuado entre fondos y tipografía
+- Selector visual Light/Dark
+- Aplicación inmediata sin recarga
 
 La lógica se encuentra centralizada en:
 
@@ -376,15 +738,9 @@ La lógica se encuentra centralizada en:
 src/context/ThemeContext.jsx
 ```
 
-Esto permite evitar lógica de temas distribuida por los componentes.
-
 ---
 
 ## Diseño Responsive
-
-La interfaz administrativa está diseñada para adaptarse a distintos tamaños de pantalla.
-
-El layout contempla:
 
 ### Desktop
 
@@ -402,12 +758,10 @@ El layout contempla:
 ### Mobile
 
 - Sidebar ocultable
-- Menú de navegación mediante botón
+- Menú mediante botón
 - Cards apiladas verticalmente
 - Contenido adaptado al ancho disponible
-- Evita scroll horizontal innecesario
-
-El objetivo es mantener las funcionalidades administrativas utilizables tanto desde escritorio como desde dispositivos móviles.
+- Prevención de scroll horizontal innecesario
 
 ---
 
@@ -415,9 +769,9 @@ El objetivo es mantener las funcionalidades administrativas utilizables tanto de
 
 Las pruebas utilizan:
 
-- **Vitest**
-- **React Testing Library**
-- **jsdom**
+- Vitest
+- React Testing Library
+- jsdom
 
 El setup se encuentra en:
 
@@ -425,37 +779,28 @@ El setup se encuentra en:
 src/test/setup.js
 ```
 
-### Ejecutar pruebas
+Ejecutar:
 
 ```bash
 npm run test
 ```
 
-Las pruebas se ejecutan en modo watch.
-
-Para salir:
-
-```text
-q
-```
-
-### Áreas cubiertas
-
-Actualmente existen pruebas relacionadas con:
+Las pruebas existentes incluyen áreas relacionadas con:
 
 - ThemeContext
-- Preferencia de tema
+- Preferencias de tema
 - Persistencia
 - Cambio de tema
 - authService
 - Login
 - Logout
-- Obtención de cuenta
-- Obtención del nombre del usuario
-- Verificación de autenticación
-- Obtención del token para API
+- Cuenta autenticada
+- Obtención del usuario
+- Access Token
+- apiClient
+- configService
 
-Las dependencias externas como MSAL utilizan mocks durante las pruebas para validar el comportamiento del código del proyecto sin depender directamente de servicios externos.
+Las dependencias externas como MSAL utilizan mocks durante las pruebas cuando corresponde.
 
 ---
 
@@ -532,219 +877,124 @@ src/
 
 ---
 
-## Arquitectura de Acceso a Datos
-
-Las páginas y componentes no deben acceder directamente a los datos.
-
-La arquitectura utilizada es:
-
-```text
-Pages / Components
-        |
-        v
-     Services
-        |
-        v
-    apiClient
-        |
-        +----------------+
-        |                |
-        v                v
-      Mocks          Backend API
-```
-
-Esto permite desarrollar utilizando mocks y posteriormente reemplazarlos por llamadas reales sin modificar significativamente los componentes visuales.
-
-### Ejemplo
-
-```text
-Products Page
-      |
-      v
-productService
-      |
-      +--> products.mock.js
-      |
-      `--> apiClient --> API Gateway
-```
-
-La selección dependerá del valor de:
-
-```env
-VITE_USE_MOCKS=true
-```
-
----
-
 ## Optimización del Bundle
 
-El proyecto utiliza estrategias de optimización proporcionadas por Vite.
+El proyecto utiliza:
 
-Entre ellas:
-
-- Lazy loading mediante `React.lazy()`
-- `Suspense` para carga de páginas
+- `React.lazy()`
+- `Suspense`
 - Code splitting
 - Separación de dependencias vendor
-- Chunks independientes para dependencias principales
+- Chunks independientes
 
-Actualmente se separan dependencias como:
+Entre las dependencias separadas se encuentran:
 
 - React
 - Bootstrap
 - React Router
 - MSAL
 
-Esto permite:
-
-- Reducir el tamaño del bundle inicial
-- Mejorar el cacheo del navegador
-- Cargar determinadas páginas solamente cuando son necesarias
-- Evitar bundles monolíticos excesivamente grandes
+Esto permite reducir el bundle inicial y mejorar el aprovechamiento de caché.
 
 ---
 
 ## Estado Actual de Implementación
 
-El Front Admin cuenta actualmente con la base técnica, visual, de autenticación y de acceso a datos necesaria para continuar con la implementación de las funcionalidades administrativas.
+### Base técnica
 
-### Fases completadas
-
-- ✅ **Fase A:** Bootstrap técnico
-  - React
-  - Bootstrap
-  - React Router
-  - Vitest
-  - Estructura base
-
-- ✅ **Fase B:** Sistema visual
-  - Variables CSS semánticas
-  - Light/Dark Mode
-  - Layout administrativo
-  - Diseño responsive
-
-- ✅ **Fase C:** MSAL + Microsoft Entra ID
-  - Configuración de MSAL
-  - Login mediante redirect
-  - Logout
-  - Rutas protegidas
-  - Obtención de información del usuario
-  - Implementación de `acquireApiToken()` con `VITE_API_SCOPE`
-
-- ✅ **Fase D:** Dashboard mock
-  - Datos obtenidos mediante capa de servicios
-  - Cards de productos
-  - Información de pedidos
-  - Estados operativos
-  - Sección de atención/revisión
-
-- ✅ **Fase E:** Integración cn1_ms_config (Configuration)
-  - Implementación de `configService` con endpoints reales
-  - Página `/configuration` con UI completa
-  - Gestión de filamentos (CRUD sin DELETE físico)
-  - Configuración energética
-  - Validaciones UX y manejo de errores
-  - Estados de UI (loading, empty, error, success)
-
-- ✅ **Fase F:** Testing
-  - Pruebas de `authService` (incluyendo acquireApiToken)
-  - Pruebas de `apiClient` (incluyendo normalización de errores HTTP)
-  - Pruebas de `configService` (endpoints contratados)
-  - 59 tests pasando
-
-- ✅ **Fase H:** Cierre
-  - Tests pasando (59/59)
-  - Build de producción exitoso
-  - README actualizado
-  - .env.example sin secretos
-  - Sin referencias arquitectónicas activas al BFF
-
-### Infraestructura preparada
-
-También se encuentra implementada la infraestructura necesaria para continuar con Productos, Pedidos y Configuración:
-
-- ✅ `apiClient.js` (integración real con cn1_ms_config)
-- ✅ `authService.js` (acquireApiToken implementado)
-- ✅ `dashboardService.js`
-- ✅ `productService.js`
-- ✅ `orderService.js`
-- ✅ `configService.js` (endpoints reales implementados)
-- ✅ Mocks de Dashboard
-- ✅ Mocks de Productos
-- ✅ Mocks de Pedidos
-- ✅ Mocks de Configuración
-- ✅ Utilidades de moneda
-- ✅ Utilidades de fechas
-- ✅ Utilidades de estados
-- ✅ Variables de entorno actualizadas
-- ✅ Modo mock configurable
+- ✅ React
+- ✅ Bootstrap
+- ✅ React Router
+- ✅ Vitest
+- ✅ Vite
+- ✅ Estructura modular
+- ✅ Responsive
+- ✅ Light/Dark Mode
 - ✅ Lazy loading
 - ✅ Code splitting
-- ✅ Build de producción funcional
 
-### Próximos pasos según PLAN_FRONTEND_ADMIN_v1.2.md
+### Autenticación
 
-El módulo de Configuración está completamente integrado con `cn1_ms_config`. Los siguientes pasos dependen de la disponibilidad de los microservicios restantes:
+- ✅ Microsoft Entra ID
+- ✅ MSAL
+- ✅ Login
+- ✅ Logout
+- ✅ Rutas protegidas
+- ✅ Access Token
+- ✅ Scope propio de API
+- ✅ Integración de Access Token con `apiClient`
 
-- ✅ Fase G: Integración local con `cn1_ms_config` (validada con éxito)
-- [ ] Implementación de Productos (cuando `ms-products` esté disponible)
-- [ ] Implementación de Pedidos (cuando `ms-orders` esté disponible)
-- ✅ Configuración de `Expose an API` en Entra ID para usar Access Token definitivo
+### Configuración
 
-### Endpoints de Configuración
+- ✅ Integración real con `cn1_ms_config`
+- ✅ Listado de filamentos
+- ✅ Creación de filamentos
+- ✅ Edición de filamentos
+- ✅ Activación/desactivación
+- ✅ Configuración energética
+- ✅ Manejo de errores
 
-El módulo de Configuración consume los siguientes endpoints de `cn1_ms_config`:
+### Productos
 
-```text
-GET    /api/v1/config/filaments
-GET    /api/v1/config/filaments/{id}
-POST   /api/v1/config/filaments
-PUT    /api/v1/config/filaments/{id}
-PATCH  /api/v1/config/filaments/{id}/status
-GET    /api/v1/config/printing
-PUT    /api/v1/config/printing
-```
+- ✅ Integración real con `cn1_ms_products`
+- ✅ Listado
+- ✅ Creación
+- ✅ Edición
+- ✅ Filamentos provenientes de `ms-config`
+- ✅ Cambio de filamento
+- ✅ Gramos de filamento
+- ✅ Horas de impresión
+- ✅ Porcentaje de ganancia
+- ✅ Activar/desactivar
+- ✅ Precio calculado
+- ✅ CURRENT/OUTDATED
+- ✅ Recálculo individual
+- ✅ Flujo de revisión antes de activación
 
-### Manejo de Errores HTTP
+### Pedidos
 
-El frontend maneja los siguientes códigos de estado:
+- ⏳ Integración con `ms-orders` pendiente
 
-- **400** - Datos inválidos en la solicitud
-- **401** - Token expirado o inválido, requiere atención de sesión
-- **403** - Acceso no autorizado
-- **404** - Recurso inexistente
-- **409** - Conflicto (ej: filamento duplicado)
-- **5xx** - Error temporal del servidor
+### Dashboard
+
+- ✅ Infraestructura disponible
+- ⚠️ Actualmente puede continuar utilizando información mock mientras se completan las integraciones necesarias
+
+---
+
+## Próximos Pasos
+
+Los principales pasos pendientes son:
+
+- Integración con `ms-orders`
+- Gestión real de pedidos
+- Integración de información real de pedidos en Dashboard
+- Completar funcionalidades administrativas restantes según el avance de los microservicios
+- Ampliar pruebas automatizadas para las integraciones de Productos
 
 ---
 
 ## Flujo Git
 
-El proyecto utiliza un flujo de trabajo basado en tres niveles de ramas:
+El proyecto utiliza:
 
 ```text
 main
-  ^
-  |
+  ↑
 develop
-  ^
-  |
+  ↑
 feature/*
 ```
 
 ### `main`
 
-Contiene únicamente versiones estables destinadas a entregas.
-
-Para la Evaluación 1, `main` recibirá la versión validada proveniente de `develop`.
+Contiene versiones estables destinadas a entregas.
 
 No se desarrolla directamente sobre esta rama.
 
 ### `develop`
 
-Contiene la integración de los avances del proyecto.
-
-Las funcionalidades terminadas y verificadas mediante Pull Request se incorporan a esta rama.
+Contiene la integración de funcionalidades terminadas y verificadas.
 
 ### `feature/*`
 
@@ -755,26 +1005,22 @@ Ejemplo:
 ```bash
 git checkout develop
 git pull
-git checkout -b feature/frontend-admin
+git checkout -b feature/products-integration
 ```
 
-Una vez terminado el trabajo:
+Después:
 
 ```bash
 git add .
-git commit -m "feat: descripción del cambio"
-git push -u origin feature/frontend-admin
+git commit -m "feat: integrar gestión de productos y configuración con microservicios"
+git push -u origin feature/products-integration
 ```
 
-Posteriormente se crea un **Pull Request**:
+Posteriormente:
 
 ```text
 feature/* → develop
 ```
-
-Una vez revisado y validado el cambio, se realiza el merge hacia `develop`.
-
-El ciclo de desarrollo continúa creando nuevas ramas `feature/*` desde la versión actualizada de `develop`.
 
 Para una entrega estable:
 
@@ -786,16 +1032,17 @@ feature/* → develop → main
 
 ## Validación antes de Pull Request
 
-Antes de crear un Pull Request hacia `develop` se recomienda ejecutar:
+Antes de crear un Pull Request hacia `develop` ejecutar:
 
 ```bash
 npm run test
 npm run build
 ```
 
-El Pull Request debe realizarse únicamente cuando:
+El Pull Request debe realizarse cuando:
 
 - Las pruebas finalizan correctamente
 - El build finaliza correctamente
 - No existen errores conocidos de ejecución
+- La integración local ha sido validada
 - Los cambios corresponden al objetivo de la rama feature
