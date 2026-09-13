@@ -13,6 +13,7 @@ const Dashboard = lazy(() => import('../pages/Dashboard/Dashboard'));
 const Configuration = lazy(() => import('../pages/Configuration/Configuration'));
 const Unauthorized = lazy(() => import('../pages/Unauthorized/Unauthorized'));
 const NotFound = lazy(() => import('../pages/NotFound/NotFound'));
+const Products = lazy(() => import('../pages/Products/Products'));
 
 /**
  * Configuración de rutas de la aplicación
@@ -50,7 +51,7 @@ const AppRoutes = () => {
               >
                 <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="dashboard" element={<Dashboard />} />
-                <Route path="products" element={<div className="p-4">Productos (próximamente)</div>} />
+                <Route path="products" element={<Products />}/>
                 <Route path="orders" element={<div className="p-4">Pedidos (próximamente)</div>} />
                 <Route path="configuration" element={<Configuration />} />
               </Route>
