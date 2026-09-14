@@ -1,62 +1,176 @@
 /**
  * Servicio para datos del Dashboard
- * 
+ *
  * Responsabilidades:
- * - Obtener métricas de resumen (productos activos/inactivos, precios desactualizados, pedidos por estado)
+ * - Obtener métricas de resumen de productos y pedidos
+ * - Obtener métricas comerciales
  * - Obtener elementos que requieren atención
+ * - Consolidar información de los microservicios existentes
  */
 
-import { apiClient } from './apiClient';
+import { getProducts } from './productService';
+import { getOrders } from './orderService';
 
 /**
- * Obtiene las métricas del Dashboard
- * @returns {Promise<Object>} Métricas del dashboard
+ * Normaliza la respuesta paginada de ms_products.
+ *
+ * @param {Object|Array} response Respuesta de productos
+ * @returns {Array} Lista de productos
  */
-export const getDashboardMetrics = async () => {
-  // TODO: Reemplazar con apiClient.get('/dashboard/metrics') cuando esté disponible
-  // Por ahora retorna datos mock
+const normalizeProducts = (response) => {
+  if (Array.isArray(response)) {
+    return response;
+  }
+
+  return response?.content ?? [];
+};
+
+/**
+ * Normaliza la respuesta de ms_orders.
+ *
+ * @param {Object|Array} response Respuesta de pedidos
+ * @returns {Array} Lista de pedidos
+ */
+const normalizeOrders = (response) => {
+  if (Array.isArray(response)) {
+    return response;
+  }
+
+  return response?.content ?? [];
+};
+
+/**
+ * Construye las métricas del Dashboard.
+ *
+ * @param {Array} products Lista de productos
+ * @param {Array} orders Lista de pedidos
+ * @returns {Object} Métricas del Dashboard
+ */
+const buildMetrics = (products, orders) => {
+  const activeProducts = products.filter(
+    (product) => product.status === 'ACTIVE'
+  ).length;
+
+  const inactiveProducts = products.filter(
+    (product) => product.status === 'INACTIVE'
+  ).length;
+
+  const outdatedPrices = products.filter(
+    (product) => product.priceStatus === 'OUTDATED'
+  ).length;
+
+  const createdOrders = orders.filter(
+    (order) => order.status === 'CREATED'
+  ).length;
+
+  const confirmedOrders = orders.filter(
+    (order) => order.status === 'CONFIRMED'
+  ).length;
+
+  const completedOrdersList = orders.filter(
+    (order) => order.status === 'COMPLETED'
+  );
+
+  const cancelledOrders = orders.filter(
+    (order) => order.status === 'CANCELLED'
+  ).length;
+
+  const completedOrders = completedOrdersList.length;
+
+  const completedSalesTotal = completedOrdersList.reduce(
+    (total, order) => total + Number(order.total ?? 0),
+    0
+  );
+
+  const averageCompletedOrder =
+    completedOrders > 0
+      ? completedSalesTotal / completedOrders
+      : 0;
+
   return {
-    activeProducts: 12,
-    inactiveProducts: 3,
-    outdatedPrices: 2,
-    createdOrders: 5,
-    confirmedOrders: 8,
-    completedOrders: 15,
+    totalProducts: products.length,
+    activeProducts,
+    inactiveProducts,
+    outdatedPrices,
+
+    totalOrders: orders.length,
+    createdOrders,
+    confirmedOrders,
+    completedOrders,
+    cancelledOrders,
+
+    completedSalesTotal,
+    averageCompletedOrder,
   };
 };
 
 /**
- * Obtiene elementos que requieren atención
- * @returns {Promise<Array>} Lista de elementos que requieren atención
+ * Construye la lista de elementos que requieren atención.
+ *
+ * Actualmente considera:
+ * - Productos con precio OUTDATED
+ * - Pedidos CREATED pendientes de confirmación
+ *
+ * @param {Array} products Lista de productos
+ * @param {Array} orders Lista de pedidos
+ * @returns {Array} Elementos que requieren atención
  */
-export const getAttentionRequired = async () => {
-  // TODO: Reemplazar con apiClient.get('/dashboard/attention-required') cuando esté disponible
-  // Por ahora retorna datos mock
-  return [
-    {
+const buildAttentionItems = (products, orders) => {
+  const outdatedProducts = products
+    .filter((product) => product.priceStatus === 'OUTDATED')
+    .map((product) => ({
       type: 'product',
-      id: 1,
-      name: 'Miniatura Space Marine',
-      filament: 'PLA Verde',
-      status: 'OUTDATED',
-    },
-    {
-      type: 'product',
-      id: 2,
-      name: 'Dragón de Ébano',
-      filament: 'ABS Negro',
-      status: 'OUTDATED',
-    },
-    {
+      id: product.id,
+      name: product.name,
+      idFilament: product.idFilament,
+      status: product.priceStatus,
+    }));
+
+  const createdOrders = orders.filter(
+    (order) => order.status === 'CREATED'
+  );
+
+  const attentionItems = [...outdatedProducts];
+
+  if (createdOrders.length > 0) {
+    attentionItems.push({
       type: 'order',
-      count: 5,
+      count: createdOrders.length,
       status: 'CREATED',
-      message: 'Pedidos pendientes de confirmación',
-    },
-  ];
+      message:
+        createdOrders.length === 1
+          ? 'Pedido pendiente de confirmación'
+          : 'Pedidos pendientes de confirmación',
+    });
+  }
+
+  return attentionItems;
+};
+
+/**
+ * Obtiene toda la información necesaria para el Dashboard.
+ *
+ * Realiza una única consulta a ms_products y una única consulta
+ * a ms_orders, reutilizando ambas respuestas para construir
+ * métricas y elementos que requieren atención.
+ *
+ * @returns {Promise<Object>} Datos consolidados del Dashboard
+ */
+export const getDashboardData = async () => {
+  const [productsResponse, ordersResponse] = await Promise.all([
+    getProducts(),
+    getOrders(),
+  ]);
+
+  const products = normalizeProducts(productsResponse);
+  const orders = normalizeOrders(ordersResponse);
+
+  return {
+    metrics: buildMetrics(products, orders),
+    attentionItems: buildAttentionItems(products, orders),
+  };
 };
 
 export default {
-  getDashboardMetrics,
-  getAttentionRequired,
+  getDashboardData,
 };

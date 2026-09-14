@@ -14,6 +14,7 @@ const Configuration = lazy(() => import('../pages/Configuration/Configuration'))
 const Unauthorized = lazy(() => import('../pages/Unauthorized/Unauthorized'));
 const NotFound = lazy(() => import('../pages/NotFound/NotFound'));
 const Products = lazy(() => import('../pages/Products/Products'));
+const Orders = lazy(() => import('../pages/Orders/Orders'));
 
 /**
  * Configuración de rutas de la aplicación
@@ -22,10 +23,10 @@ const Products = lazy(() => import('../pages/Products/Products'));
  * - /login
  *
  * Rutas protegidas (requieren autenticación MSAL):
- * - /dashboard (implementado)
- * - /products (temporal - próximamente)
- * - /orders (temporal - próximamente)
- * - /configuration (implementado)
+ * - /dashboard
+ * - /products
+ * - /orders
+ * - /configuration
  *
  * Las páginas administrativas se cargan bajo demanda con React.lazy()
  * para optimizar el bundle inicial.
@@ -49,16 +50,42 @@ const AppRoutes = () => {
                   </ProtectedRoute>
                 }
               >
-                <Route index element={<Navigate to="/dashboard" replace />} />
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="products" element={<Products />}/>
-                <Route path="orders" element={<div className="p-4">Pedidos (próximamente)</div>} />
-                <Route path="configuration" element={<Configuration />} />
+                <Route
+                  index
+                  element={<Navigate to="/dashboard" replace />}
+                />
+
+                <Route
+                  path="dashboard"
+                  element={<Dashboard />}
+                />
+
+                <Route
+                  path="products"
+                  element={<Products />}
+                />
+
+                <Route
+                  path="orders"
+                  element={<Orders />}
+                />
+
+                <Route
+                  path="configuration"
+                  element={<Configuration />}
+                />
               </Route>
 
               {/* Rutas de error */}
-              <Route path="/unauthorized" element={<Unauthorized />} />
-              <Route path="*" element={<NotFound />} />
+              <Route
+                path="/unauthorized"
+                element={<Unauthorized />}
+              />
+
+              <Route
+                path="*"
+                element={<NotFound />}
+              />
             </Routes>
           </Suspense>
         </Router>
