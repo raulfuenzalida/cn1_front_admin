@@ -7,6 +7,7 @@
  * - Token MSAL (Access Token)
  * - Authorization: Bearer
  * - Parseo de respuestas
+ * - Soporte para respuestas JSON y Blob
  * - Normalización de errores HTTP
  */
 
@@ -21,22 +22,29 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
  */
 const normalizeError = (response) => {
   const status = response.status;
-  
+
   switch (status) {
     case 400:
       return new Error('Datos inválidos en la solicitud');
     case 401:
-      return new Error('Sesión expirada o inválida. Por favor inicie sesión nuevamente.');
+      return new Error(
+        'Sesión expirada o inválida. Por favor inicie sesión nuevamente.'
+      );
     case 403:
       return new Error('Acceso no autorizado');
     case 404:
       return new Error('Recurso no encontrado');
     case 409:
-      return new Error('Conflicto: el recurso ya existe o viola una regla de negocio');
+      return new Error(
+        'Conflicto: el recurso ya existe o viola una regla de negocio'
+      );
     default:
       if (status >= 500) {
-        return new Error('Error temporal del servidor. Por favor intente nuevamente.');
+        return new Error(
+          'Error temporal del servidor. Por favor intente nuevamente.'
+        );
       }
+
       return new Error(`Error HTTP: ${status}`);
   }
 };
@@ -56,36 +64,61 @@ const getApiToken = async () => {
 
 /**
  * Realiza una petición HTTP con headers comunes
+ *
  * @param {string} endpoint - Endpoint de la API
  * @param {Object} options - Opciones de fetch
- * @returns {Promise<Object>} Respuesta parseada
+ * @param {'json'|'blob'} responseType - Tipo de respuesta esperada
+ * @returns {Promise<Object|Blob|null>} Respuesta parseada
  */
-const fetchWithAuth = async (endpoint, options = {}) => {
+const fetchWithAuth = async (
+  endpoint,
+  options = {},
+  responseType = 'json'
+) => {
   const url = `${API_BASE_URL}${endpoint}`;
   const token = await getApiToken();
-  
+
   const headers = {
-    'Accept': 'application/json',
-    ...(options.body && { 'Content-Type': 'application/json' }),
-    ...(token && { Authorization: `Bearer ${token}` }),
+    Accept:
+      responseType === 'blob'
+        ? 'application/pdf'
+        : 'application/json',
+    ...(options.body && {
+      'Content-Type': 'application/json',
+    }),
+    ...(token && {
+      Authorization: `Bearer ${token}`,
+    }),
     ...options.headers,
   };
-  
+
   const response = await fetch(url, {
     ...options,
     headers,
   });
-  
+
   if (!response.ok) {
     throw normalizeError(response);
   }
-  
-  // Manejar respuestas sin body (ej: 204 No Content)
-  const contentType = response.headers.get('content-type');
-  if (!contentType || !contentType.includes('application/json')) {
+
+  if (responseType === 'blob') {
+    return response.blob();
+  }
+
+  // Respuestas sin contenido
+  if (response.status === 204) {
     return null;
   }
-  
+
+  const contentType = response.headers.get('content-type');
+
+  if (
+    !contentType ||
+    !contentType.includes('application/json')
+  ) {
+    return null;
+  }
+
   return response.json();
 };
 
@@ -95,50 +128,79 @@ const fetchWithAuth = async (endpoint, options = {}) => {
 export const apiClient = {
   /**
    * GET request
+   *
    * @param {string} endpoint - Endpoint
-   * @returns {Promise<Object>} Respuesta
+   * @param {Object} options - Opciones adicionales
+   * @param {'json'|'blob'} options.responseType - Tipo de respuesta
+   * @returns {Promise<Object|Blob|null>} Respuesta
    */
-  get: (endpoint) => fetchWithAuth(endpoint, { method: 'GET' }),
-  
+  get: (endpoint, options = {}) => {
+    const {
+      responseType = 'json',
+      ...fetchOptions
+    } = options;
+
+    return fetchWithAuth(
+      endpoint,
+      {
+        method: 'GET',
+        ...fetchOptions,
+      },
+      responseType
+    );
+  },
+
   /**
    * POST request
+   *
    * @param {string} endpoint - Endpoint
    * @param {Object} data - Datos a enviar
-   * @returns {Promise<Object>} Respuesta
+   * @returns {Promise<Object|null>} Respuesta
    */
-  post: (endpoint, data) => fetchWithAuth(endpoint, {
-    method: 'POST',
-    body: JSON.stringify(data),
-  }),
-  
+  post: (endpoint, data) =>
+    fetchWithAuth(endpoint, {
+      method: 'POST',
+      body: data !== undefined
+        ? JSON.stringify(data)
+        : undefined,
+    }),
+
   /**
    * PUT request
+   *
    * @param {string} endpoint - Endpoint
    * @param {Object} data - Datos a enviar
-   * @returns {Promise<Object>} Respuesta
+   * @returns {Promise<Object|null>} Respuesta
    */
-  put: (endpoint, data) => fetchWithAuth(endpoint, {
-    method: 'PUT',
-    body: JSON.stringify(data),
-  }),
-  
+  put: (endpoint, data) =>
+    fetchWithAuth(endpoint, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
   /**
    * PATCH request
+   *
    * @param {string} endpoint - Endpoint
    * @param {Object} data - Datos a enviar
-   * @returns {Promise<Object>} Respuesta
+   * @returns {Promise<Object|null>} Respuesta
    */
-  patch: (endpoint, data) => fetchWithAuth(endpoint, {
-    method: 'PATCH',
-    body: JSON.stringify(data),
-  }),
-  
+  patch: (endpoint, data) =>
+    fetchWithAuth(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
   /**
    * DELETE request
+   *
    * @param {string} endpoint - Endpoint
-   * @returns {Promise<Object>} Respuesta
+   * @returns {Promise<Object|null>} Respuesta
    */
-  delete: (endpoint) => fetchWithAuth(endpoint, { method: 'DELETE' }),
+  delete: (endpoint) =>
+    fetchWithAuth(endpoint, {
+      method: 'DELETE',
+    }),
 };
 
 export default apiClient;

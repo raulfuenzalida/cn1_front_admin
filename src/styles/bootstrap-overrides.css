@@ -36,6 +36,7 @@
 }
 
 /* Cards */
+
 .card {
   background-color: var(--bg-surface);
   border-color: var(--border-default);
@@ -53,6 +54,7 @@
 }
 
 /* Navbar */
+
 .navbar {
   background-color: var(--layout-navbar-bg);
   border-color: var(--layout-navbar-border);
@@ -71,6 +73,7 @@
 }
 
 /* Sidebar personalizado */
+
 .sidebar {
   background-color: var(--layout-sidebar-bg);
   border-right: 1px solid var(--layout-sidebar-border);
@@ -92,8 +95,32 @@
 }
 
 /* Tablas */
+
 .table {
+  --bs-table-color: var(--text-primary);
+  --bs-table-bg: var(--bg-surface);
+  --bs-table-border-color: var(--border-default);
+
+  --bs-table-striped-color: var(--text-primary);
+  --bs-table-striped-bg: var(--bg-surface-elevated);
+
+  --bs-table-hover-color: var(--text-primary);
+  --bs-table-hover-bg: var(--bg-surface-elevated);
+
   color: var(--text-primary);
+  border-color: var(--border-default);
+}
+
+.table > :not(caption) > * > * {
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+  border-bottom-color: var(--border-default);
+}
+
+.table > thead > tr > th {
+  color: var(--text-primary);
+  background-color: var(--bg-surface-elevated);
+  border-bottom-color: var(--border-default);
 }
 
 .table-striped > tbody > tr:nth-of-type(odd) > * {
@@ -102,6 +129,7 @@
 }
 
 /* Formularios */
+
 .form-control {
   background-color: var(--bg-surface);
   border-color: var(--border-default);
@@ -125,6 +153,7 @@
 }
 
 /* Offcanvas */
+
 .offcanvas {
   background-color: var(--layout-sidebar-bg);
   color: var(--layout-sidebar-text);
@@ -139,6 +168,7 @@
 }
 
 /* Dropdown */
+
 .dropdown-toggle {
   background-color: var(--layout-user-dropdown-bg) !important;
   color: var(--layout-user-dropdown-text) !important;
@@ -168,6 +198,7 @@
 }
 
 /* Modal */
+
 .modal-content {
   background-color: var(--bg-surface);
   color: var(--text-primary);
@@ -183,6 +214,7 @@
 }
 
 /* Alert */
+
 .alert {
   color: var(--text-primary);
 }
