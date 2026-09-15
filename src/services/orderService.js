@@ -18,7 +18,7 @@ import { apiClient } from './apiClient';
  * @returns {Promise<Array>} Lista de pedidos
  */
 export const getOrders = async () => {
-  return apiClient.get('/api/v1/orders');
+  return apiClient.get('/api/v1/orders/obtener');
 };
 
 /**
