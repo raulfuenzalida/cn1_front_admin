@@ -28,7 +28,7 @@ export const getProduct = async (id) => {
 
 // Crear producto
 export const createProduct = async (productData) => {
-  return apiClient.post('/api/v1/products', productData);
+  return apiClient.post('/api/v1/products/admin', productData);
 };
 
 // Actualizar producto
