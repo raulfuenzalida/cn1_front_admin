@@ -1,8 +1,8 @@
-# PrintWorks Admin
+# PrintWorks Web Admin
 
 Panel de administración de PrintWorks, aplicación web para la gestión de un emprendimiento de impresión 3D.
 
-## Descripción
+## Descripción 
 
 `cn1_front_admin` es el frontend administrativo de PrintWorks, diseñado para gestionar productos, pedidos y configuración del sistema.
 
