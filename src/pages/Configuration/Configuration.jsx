@@ -41,6 +41,7 @@ const Configuration = () => {
     name: '',
     color: '#000000',
     pricePerKg: '',
+    stockGrams: '',
   });
   const [printConfigForm, setPrintConfigForm] = useState({
     kwhPrice: '',
@@ -117,12 +118,18 @@ const Configuration = () => {
       setFilamentSubmitting(false);
       return;
     }
+    if (filamentForm.stockGrams !== '' && parseFloat(filamentForm.stockGrams) <= 0) {
+      setFilamentsError('El stock en gramos debe ser mayor a 0');
+      setFilamentSubmitting(false);
+      return;
+    }
 
     try {
       const filamentData = {
         name: filamentForm.name.trim(),
         color: filamentForm.color,
         pricePerKg: parseFloat(filamentForm.pricePerKg),
+        stockGrams: filamentForm.stockGrams === '' ? null : parseFloat(filamentForm.stockGrams),
         status: 'ACTIVE', // Estado por defecto para nuevos filamentos
       };
 
@@ -188,6 +195,7 @@ const Configuration = () => {
       name: filament.name,
       color: filament.color,
       pricePerKg: filament.pricePerKg,
+      stockGrams: filament.stockGrams ?? '',
     });
     setShowFilamentModal(true);
   };
@@ -208,6 +216,7 @@ const Configuration = () => {
       name: '',
       color: '#000000',
       pricePerKg: '',
+      stockGrams: '',
     });
   };
 
@@ -270,6 +279,7 @@ const Configuration = () => {
                   <th>Nombre</th>
                   <th>Color</th>
                   <th>Precio/kg</th>
+                  <th>Stock (g)</th>
                   <th>Estado</th>
                   <th>Actualizado</th>
                   <th>Acciones</th>
@@ -289,6 +299,7 @@ const Configuration = () => {
                       </div>
                     </td>
                     <td>{formatCLP(filament.pricePerKg)}</td>
+                    <td>{filament.stockGrams != null ? `${filament.stockGrams} g` : '—'}</td>
                     <td>
                       <span className={`badge ${filament.status === 'ACTIVE' ? 'bg-success' : 'bg-secondary'}`}>
                         {filament.status}
@@ -461,6 +472,23 @@ const Configuration = () => {
                 disabled={filamentSubmitting}
                 required
               />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Stock en gramos (opcional)</Form.Label>
+              <Form.Control
+                type="number"
+                step="0.01"
+                min="0"
+                value={filamentForm.stockGrams}
+                onChange={(e) => setFilamentForm({ ...filamentForm, stockGrams: e.target.value })}
+                disabled={filamentSubmitting}
+                placeholder="Vacío = sin stock definido"
+              />
+              <Form.Text className="text-muted">
+                Gramos disponibles del filamento. Se descuenta automáticamente
+                al confirmar pedidos. Vacío significa sin límite de stock.
+              </Form.Text>
             </Form.Group>
 
             <div className="d-flex justify-content-end gap-2">
