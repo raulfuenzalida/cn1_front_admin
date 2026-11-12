@@ -532,9 +532,9 @@ PUT    /api/v1/config/printing
 
 Actualmente permite:
 
-- Listar filamentos
-- Crear filamentos
-- Editar filamentos
+- Listar filamentos (incluye stock en gramos `stockGrams`, `—` si no definido)
+- Crear filamentos (stock en gramos opcional)
+- Editar filamentos (stock editable; vacío conserva el valor actual)
 - Activar/desactivar filamentos
 - Consultar configuración energética
 - Modificar precio de electricidad
